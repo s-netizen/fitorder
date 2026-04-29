@@ -12,7 +12,23 @@ const QUICK_PROMPTS = [
   { label: "🥦 Veg only", text: "Show me vegetarian options only" },
   { label: "💊 Instamart protein", text: "Check Instamart for protein supplements" },
   { label: "💰 Under ₹250", text: "Find options under ₹250" },
+  { label: "🔄 Reorder past meal", text: "Show my past Swiggy orders and suggest which one fits my macros best today" },
 ];
+
+// TDEE Calculator
+function calcTDEE(weight, height, age, gender, activity, goal) {
+  const bmr = gender === "male"
+    ? 10 * weight + 6.25 * height - 5 * age + 5
+    : 10 * weight + 6.25 * height - 5 * age - 161;
+  const actMult = { sedentary: 1.2, light: 1.375, moderate: 1.55, active: 1.725, very: 1.9 };
+  const tdee = bmr * (actMult[activity] || 1.55);
+  const goalAdj = { cut: -400, bulk: 300, recomp: 0, maintain: 0 };
+  const calories = Math.round(tdee + (goalAdj[goal] || 0));
+  const protein = Math.round(weight * 2.0);
+  const fat = Math.round((calories * 0.25) / 9);
+  const carbs = Math.round((calories - protein * 4 - fat * 9) / 4);
+  return { calories, protein: Math.max(protein, 80), carbs: Math.max(carbs, 50), fat: Math.max(fat, 30) };
+}
 
 function Scooter({ size = 90 }) {
   return (
@@ -204,6 +220,8 @@ function TypingDots() {
 
 export default function App() {
   const [macros, setMacros] = useState({ goal: "recomp", protein: 160, carbs: 180, fat: 60, consumed: { protein: 85, carbs: 90, fat: 32 } });
+  const [macroMode, setMacroMode] = useState("manual"); // "manual" | "calculate"
+  const [body, setBody] = useState({ weight: 75, height: 175, age: 28, gender: "male", activity: "moderate" });
   const [started, setStarted] = useState(false);
   const [input, setInput] = useState("");
   const agent = useAgent(macros);
@@ -304,13 +322,142 @@ export default function App() {
             </div>
           </div>
 
-          {/* Sliders */}
+          {/* Mode toggle */}
+          <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
+            {[["manual", "✏️ Set Manually"], ["calculate", "📐 Calculate for Me"]].map(([mode, label]) => (
+              <button key={mode} onClick={() => {
+                setMacroMode(mode);
+                if (mode === "calculate") {
+                  const calc = calcTDEE(body.weight, body.height, body.age, body.gender, body.activity, macros.goal);
+                  setMacros(m => ({ ...m, protein: calc.protein, carbs: calc.carbs, fat: calc.fat }));
+                }
+              }} style={{
+                flex: 1, background: macroMode === mode ? O : "#111",
+                color: macroMode === mode ? "#fff" : "#666",
+                border: `1px solid ${macroMode === mode ? O : BORDER}`,
+                borderRadius: 9, padding: "9px 8px", fontSize: 11, fontWeight: 700,
+                cursor: "pointer", transition: "all 0.18s", fontFamily: "inherit",
+              }}>{label}</button>
+            ))}
+          </div>
+
+          {/* TDEE Calculator */}
+          {macroMode === "calculate" && (
+            <div style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "16px 18px", marginBottom: 10 }}>
+              <div style={{ fontSize: 11, color: "#888", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 14 }}>Body Stats</div>
+              
+              {/* Gender */}
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ fontSize: 11, color: "#aaa", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 7 }}>Gender</div>
+                <div style={{ display: "flex", gap: 6 }}>
+                  {[["male", "♂ Male"], ["female", "♀ Female"]].map(([g, label]) => (
+                    <button key={g} onClick={() => {
+                      setBody(b => ({ ...b, gender: g }));
+                      const calc = calcTDEE(body.weight, body.height, body.age, g, body.activity, macros.goal);
+                      setMacros(m => ({ ...m, protein: calc.protein, carbs: calc.carbs, fat: calc.fat }));
+                    }} style={{ flex: 1, background: body.gender === g ? "#1a1a2e" : "#111", color: body.gender === g ? "#818cf8" : "#555", border: `1px solid ${body.gender === g ? "#818cf8" : BORDER}`, borderRadius: 8, padding: "8px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s" }}>{label}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Weight / Height / Age sliders */}
+              {[
+                { name: "Weight", unit: "kg", val: body.weight, min: 40, max: 150, key: "weight" },
+                { name: "Height", unit: "cm", val: body.height, min: 140, max: 220, key: "height" },
+                { name: "Age", unit: "yrs", val: body.age, min: 16, max: 70, key: "age" },
+              ].map(s => (
+                <div key={s.key} style={{ marginBottom: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+                    <span style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 }}>{s.name}</span>
+                    <span style={{ fontFamily: "'Space Grotesk',monospace", fontSize: 13, fontWeight: 700, color: "#fff" }}>{s.val}{s.unit}</span>
+                  </div>
+                  <input type="range" min={s.min} max={s.max} value={s.val} onChange={e => {
+                    const newBody = { ...body, [s.key]: +e.target.value };
+                    setBody(newBody);
+                    const calc = calcTDEE(newBody.weight, newBody.height, newBody.age, newBody.gender, newBody.activity, macros.goal);
+                    setMacros(m => ({ ...m, protein: calc.protein, carbs: calc.carbs, fat: calc.fat }));
+                  }} style={{ width: "100%", accentColor: "#818cf8", height: 3 }}/>
+                </div>
+              ))}
+
+              {/* Activity */}
+              <div style={{ marginBottom: 4 }}>
+                <div style={{ fontSize: 11, color: "#aaa", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 7 }}>Activity Level</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                  {[
+                    ["sedentary", "🪑 Sedentary", "Desk job, no exercise"],
+                    ["light", "🚶 Light", "1–3 days/week"],
+                    ["moderate", "🏃 Moderate", "3–5 days/week"],
+                    ["active", "💪 Active", "6–7 days/week"],
+                    ["very", "🔥 Very Active", "Twice daily"],
+                  ].map(([key, label, sub]) => (
+                    <button key={key} onClick={() => {
+                      const newBody = { ...body, activity: key };
+                      setBody(newBody);
+                      const calc = calcTDEE(newBody.weight, newBody.height, newBody.age, newBody.gender, key, macros.goal);
+                      setMacros(m => ({ ...m, protein: calc.protein, carbs: calc.carbs, fat: calc.fat }));
+                    }} style={{
+                      background: body.activity === key ? "#1a1200" : "#111",
+                      color: body.activity === key ? O : "#555",
+                      border: `1px solid ${body.activity === key ? O + "55" : BORDER}`,
+                      borderRadius: 8, padding: "8px 12px", fontSize: 11, fontWeight: 700,
+                      cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s",
+                      textAlign: "left", display: "flex", justifyContent: "space-between", alignItems: "center",
+                    }}>
+                      <span>{label}</span>
+                      <span style={{ fontSize: 10, color: body.activity === key ? O + "aa" : "#333", fontWeight: 400 }}>{sub}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Calculated result */}
+              <div style={{ marginTop: 14, background: "#111", border: `1px solid ${O}22`, borderRadius: 10, padding: "10px 14px" }}>
+                <div style={{ fontSize: 9, color: "#555", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>Calculated Macros</div>
+                <div style={{ display: "flex", gap: 12 }}>
+                  {[
+                    { l: "Protein", v: macros.protein, c: "#4ade80" },
+                    { l: "Carbs", v: macros.carbs, c: "#60a5fa" },
+                    { l: "Fat", v: macros.fat, c: O },
+                  ].map(m => (
+                    <div key={m.l} style={{ textAlign: "center", flex: 1 }}>
+                      <div style={{ fontSize: 16, fontWeight: 800, color: m.c, fontFamily: "'Space Grotesk',sans-serif" }}>{m.v}g</div>
+                      <div style={{ fontSize: 9, color: "#444", textTransform: "uppercase", letterSpacing: "0.06em" }}>{m.l}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Manual sliders */}
+          {macroMode === "manual" && (
+            <>
+            {[
+              { label: "Daily Targets", items: [
+                { name: "Protein", val: macros.protein, max: 300, color: "#4ade80", fn: setM("protein") },
+                { name: "Carbs", val: macros.carbs, max: 400, color: "#60a5fa", fn: setM("carbs") },
+                { name: "Fat", val: macros.fat, max: 150, color: O, fn: setM("fat") },
+              ]},
+            ].map(({ label, items }) => (
+              <div key={label} style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "16px 18px", marginBottom: 10 }}>
+                <div style={{ fontSize: 11, color: "#888", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 14 }}>{label}</div>
+                {items.map(s => (
+                  <div key={s.name} style={{ marginBottom: 16 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                      <span style={{ fontSize: 12, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 }}>{s.name}</span>
+                      <span style={{ fontFamily: "'Space Grotesk',monospace", fontSize: 14, fontWeight: 700, color: s.color }}>{s.val}g</span>
+                    </div>
+                    <input type="range" min={20} max={s.max} value={s.val} onChange={e => s.fn(+e.target.value)} style={{ width: "100%", accentColor: s.color, height: 3 }}/>
+                  </div>
+                ))}
+              </div>
+            ))}
+            </>
+          )}
+
+          {/* Eaten today — always shown */}
           {[
-            { label: "Daily Targets", items: [
-              { name: "Protein", val: macros.protein, max: 300, color: "#4ade80", fn: setM("protein") },
-              { name: "Carbs", val: macros.carbs, max: 400, color: "#60a5fa", fn: setM("carbs") },
-              { name: "Fat", val: macros.fat, max: 150, color: O, fn: setM("fat") },
-            ]},
             { label: "Eaten Today", items: [
               { name: "Protein", val: macros.consumed.protein, max: macros.protein, color: "#4ade80", fn: setC("protein") },
               { name: "Carbs", val: macros.consumed.carbs, max: macros.carbs, color: "#60a5fa", fn: setC("carbs") },
