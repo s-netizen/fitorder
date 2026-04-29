@@ -281,19 +281,22 @@ export default function App() {
       <div style={{ width: "50%", flexShrink: 0, borderRight: `1px solid ${BORDER}`, display: "flex", flexDirection: "column", height: "100vh", position: "relative", zIndex: 1, background: "#0a0a0a" }}>
 
         {/* Logo area */}
-        <div style={{ padding: "20px 22px 16px", borderBottom: `1px solid ${BORDER}`, flexShrink: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-            <Scooter size={72}/>
-            <div>
-              <div style={{ fontSize: 26, fontWeight: 800, fontFamily: "'Space Grotesk',sans-serif", letterSpacing: "-0.03em" }}>Fit<span style={{ color: O }}>Order</span></div>
-              <div style={{ fontSize: 8, color: "#666", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700 }}>Swiggy Builders Club</div>
+        <div style={{ padding: "18px 22px 14px", borderBottom: `1px solid ${BORDER}`, flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <Scooter size={64}/>
+              <div>
+                <div style={{ fontSize: 32, fontWeight: 800, fontFamily: "'Space Grotesk',sans-serif", letterSpacing: "-0.04em", lineHeight: 1 }}>Fit<span style={{ color: O }}>Order</span></div>
+                <div style={{ fontSize: 9, color: "#555", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginTop: 4 }}>Swiggy Builders Club</div>
+              </div>
+            </div>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#110a00", border: "1px solid #2a1800", borderRadius: 99, padding: "4px 10px", flexShrink: 0 }}>
+              <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#f59e0b", animation: "demoPulse 1.5s infinite" }}/>
+              <span style={{ fontSize: 9, color: "#f59e0b", fontWeight: 700, letterSpacing: "0.06em" }}>DEMO · Food + Instamart MCP</span>
             </div>
           </div>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#110a00", border: "1px solid #2a1800", borderRadius: 99, padding: "3px 9px" }}>
-            <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#f59e0b", animation: "demoPulse 1.5s infinite" }}/>
-            <span style={{ fontSize: 8, color: "#f59e0b", fontWeight: 700, letterSpacing: "0.08em" }}>DEMO · Food + Instamart MCP</span>
-          </div>
         </div>
+
 
         {/* Scrollable config */}
         <div style={{ flex: 1, overflowY: "auto", padding: "16px 22px" }}>
