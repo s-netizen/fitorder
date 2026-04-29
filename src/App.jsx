@@ -64,11 +64,11 @@ function Ring({ label, val, max, color, size = 54 }) {
             style={{ transition: "stroke-dasharray 0.5s cubic-bezier(0.34,1.56,0.64,1)" }}/>
         </svg>
         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ fontSize: 12, fontWeight: 800, fontFamily: "'Space Grotesk',sans-serif", color, lineHeight: 1 }}>{val}</div>
-          <div style={{ fontSize: 7, color: "#333" }}>/{max}</div>
+          <div style={{ fontSize: 15, fontWeight: 800, fontFamily: "'Space Grotesk',sans-serif", color, lineHeight: 1 }}>{val}</div>
+          <div style={{ fontSize: 9, color: "#444" }}>/{max}</div>
         </div>
       </div>
-      <div style={{ fontSize: 9, color: "#777", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700, marginTop: 5 }}>{label}</div>
+      <div style={{ fontSize: 12, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700, marginTop: 5 }}>{label}</div>
     </div>
   );
 }
@@ -78,7 +78,7 @@ function MealCard({ name, restaurant, protein, carbs, fat, price, eta, score, so
   const isInsta = source === "Instamart" || restaurant === "Instamart";
   function handleAdd() { setAdded(true); onAdd?.(name); setTimeout(() => setAdded(false), 2500); }
   return (
-    <div style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 12, padding: "10px 12px", marginBottom: 8, position: "relative", overflow: "hidden" }}>
+    <div style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "16px 18px", marginBottom: 10, position: "relative", overflow: "hidden" }}>
       {score >= 85 && <div style={{ position: "absolute", top: 0, right: 0, background: O, fontSize: 7, fontWeight: 800, color: "#fff", padding: "2px 8px", borderBottomLeftRadius: 6, letterSpacing: "0.1em" }}>TOP PICK</div>}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -259,11 +259,11 @@ export default function App() {
       <div style={{ width: "50%", flexShrink: 0, borderRight: `1px solid ${BORDER}`, display: "flex", flexDirection: "column", height: "100vh", position: "relative", zIndex: 1, background: "#0a0a0a" }}>
 
         {/* Logo area */}
-        <div style={{ padding: "16px 18px 12px", borderBottom: `1px solid ${BORDER}`, flexShrink: 0 }}>
+        <div style={{ padding: "20px 22px 16px", borderBottom: `1px solid ${BORDER}`, flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
             <Scooter size={72}/>
             <div>
-              <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'Space Grotesk',sans-serif", letterSpacing: "-0.03em" }}>Fit<span style={{ color: O }}>Order</span></div>
+              <div style={{ fontSize: 26, fontWeight: 800, fontFamily: "'Space Grotesk',sans-serif", letterSpacing: "-0.03em" }}>Fit<span style={{ color: O }}>Order</span></div>
               <div style={{ fontSize: 8, color: "#666", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700 }}>Swiggy Builders Club</div>
             </div>
           </div>
@@ -274,33 +274,33 @@ export default function App() {
         </div>
 
         {/* Scrollable config */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "12px 16px" }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: "16px 22px" }}>
 
           {/* Goal */}
           <div style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 9, color: "#666", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 7 }}>Goal</div>
+            <div style={{ fontSize: 11, color: "#888", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 10 }}>Goal</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 5 }}>
               {Object.entries(GOALS).map(([k, v]) => (
                 <button key={k} className="gbtn" onClick={() => setMacros(m => ({ ...m, goal: k }))} style={{
                   background: macros.goal === k ? O : "#111", color: macros.goal === k ? "#fff" : "#888",
-                  border: `1px solid ${macros.goal === k ? O : BORDER}`, borderRadius: 9, padding: "7px 8px",
-                  fontSize: 10, fontWeight: 700, cursor: "pointer", transition: "all 0.18s",
-                  textAlign: "left", display: "flex", alignItems: "center", gap: 5,
+                  border: `1px solid ${macros.goal === k ? O : BORDER}`, borderRadius: 10, padding: "12px 14px",
+                  fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.18s",
+                  textAlign: "left", display: "flex", alignItems: "center", gap: 8,
                 }}>
-                  <span style={{ fontSize: 13 }}>{GOAL_ICONS[k]}</span><span>{v}</span>
+                  <span style={{ fontSize: 16 }}>{GOAL_ICONS[k]}</span><span>{v}</span>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Macro rings */}
-          <div style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 12, padding: "10px 8px", marginBottom: 10 }}>
-            <div style={{ fontSize: 9, color: "#666", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 10 }}>Still Needed Today</div>
+          <div style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "16px 14px", marginBottom: 12 }}>
+            <div style={{ fontSize: 11, color: "#888", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 14 }}>Still Needed Today</div>
             <div style={{ display: "flex", justifyContent: "space-around" }}>
-              <Ring label="Protein" val={rem.p} max={macros.protein} color="#4ade80"/>
-              <Ring label="Carbs" val={rem.c} max={macros.carbs} color="#60a5fa"/>
-              <Ring label="Fat" val={rem.f} max={macros.fat} color={O}/>
-              <Ring label="kcal" val={rem.p*4+rem.c*4+rem.f*9} max={macros.protein*4+macros.carbs*4+macros.fat*9} color="#c084fc"/>
+              <Ring label="Protein" val={rem.p} max={macros.protein} color="#4ade80" size={68}/>
+              <Ring label="Carbs" val={rem.c} max={macros.carbs} color="#60a5fa" size={68}/>
+              <Ring label="Fat" val={rem.f} max={macros.fat} color={O} size={68}/>
+              <Ring label="kcal" val={rem.p*4+rem.c*4+rem.f*9} max={macros.protein*4+macros.carbs*4+macros.fat*9} color="#c084fc" size={68}/>
             </div>
           </div>
 
@@ -317,13 +317,13 @@ export default function App() {
               { name: "Fat", val: macros.consumed.fat, max: macros.fat, color: O, fn: setC("fat") },
             ]},
           ].map(({ label, items }) => (
-            <div key={label} style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 12, padding: "10px 12px", marginBottom: 8 }}>
-              <div style={{ fontSize: 9, color: "#666", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 10 }}>{label}</div>
+            <div key={label} style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "16px 18px", marginBottom: 10 }}>
+              <div style={{ fontSize: 11, color: "#888", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 14 }}>{label}</div>
               {items.map(s => (
-                <div key={s.name} style={{ marginBottom: 10 }}>
+                <div key={s.name} style={{ marginBottom: 16 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                    <span style={{ fontSize: 10, color: "#888", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>{s.name}</span>
-                    <span style={{ fontFamily: "'Space Grotesk',monospace", fontSize: 11, fontWeight: 700, color: s.color }}>{s.val}g</span>
+                    <span style={{ fontSize: 12, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 }}>{s.name}</span>
+                    <span style={{ fontFamily: "'Space Grotesk',monospace", fontSize: 14, fontWeight: 700, color: s.color }}>{s.val}g</span>
                   </div>
                   <input type="range" min={20} max={s.max} value={s.val} onChange={e => s.fn(+e.target.value)} style={{ width: "100%", accentColor: s.color, height: 3 }}/>
                 </div>
@@ -333,10 +333,10 @@ export default function App() {
         </div>
 
         {/* CTA button */}
-        <div style={{ padding: "12px 16px", borderTop: `1px solid ${BORDER}`, flexShrink: 0 }}>
+        <div style={{ padding: "16px 22px", borderTop: `1px solid ${BORDER}`, flexShrink: 0 }}>
           <button className="sbtn" onClick={handleStart} style={{
             width: "100%", background: O, color: "#fff", border: "none",
-            borderRadius: 11, padding: "13px", fontSize: 13, fontWeight: 800,
+            borderRadius: 14, padding: "16px", fontSize: 13, fontWeight: 800,
             cursor: "pointer", letterSpacing: "0.02em",
             boxShadow: `0 6px 28px ${O}44`, transition: "all 0.2s",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
