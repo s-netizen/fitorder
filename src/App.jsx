@@ -68,7 +68,7 @@ function Ring({ label, val, max, color, size = 54 }) {
           <div style={{ fontSize: 7, color: "#333" }}>/{max}</div>
         </div>
       </div>
-      <div style={{ fontSize: 8, color: "#3a3a3a", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700, marginTop: 5 }}>{label}</div>
+      <div style={{ fontSize: 9, color: "#777", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700, marginTop: 5 }}>{label}</div>
     </div>
   );
 }
@@ -256,7 +256,7 @@ export default function App() {
       <div style={{ position: "fixed", top: "30%", left: "35%", width: 500, height: 500, borderRadius: "50%", background: `radial-gradient(circle, ${O}18 0%, transparent 70%)`, animation: "glow 6s ease-in-out infinite", pointerEvents: "none", zIndex: 0 }}/>
 
       {/* ── LEFT: Setup panel ─────────────────────────────────────────────── */}
-      <div style={{ width: 300, flexShrink: 0, borderRight: `1px solid ${BORDER}`, display: "flex", flexDirection: "column", height: "100vh", position: "relative", zIndex: 1, background: "#0a0a0a" }}>
+      <div style={{ width: "50%", flexShrink: 0, borderRight: `1px solid ${BORDER}`, display: "flex", flexDirection: "column", height: "100vh", position: "relative", zIndex: 1, background: "#0a0a0a" }}>
 
         {/* Logo area */}
         <div style={{ padding: "16px 18px 12px", borderBottom: `1px solid ${BORDER}`, flexShrink: 0 }}>
@@ -264,7 +264,7 @@ export default function App() {
             <Scooter size={72}/>
             <div>
               <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'Space Grotesk',sans-serif", letterSpacing: "-0.03em" }}>Fit<span style={{ color: O }}>Order</span></div>
-              <div style={{ fontSize: 8, color: "#2a2a2a", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700 }}>Swiggy Builders Club</div>
+              <div style={{ fontSize: 8, color: "#666", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700 }}>Swiggy Builders Club</div>
             </div>
           </div>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#110a00", border: "1px solid #2a1800", borderRadius: 99, padding: "3px 9px" }}>
@@ -278,11 +278,11 @@ export default function App() {
 
           {/* Goal */}
           <div style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 8, color: "#2a2a2a", letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 700, marginBottom: 7 }}>Goal</div>
+            <div style={{ fontSize: 9, color: "#666", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 7 }}>Goal</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 5 }}>
               {Object.entries(GOALS).map(([k, v]) => (
                 <button key={k} className="gbtn" onClick={() => setMacros(m => ({ ...m, goal: k }))} style={{
-                  background: macros.goal === k ? O : "#111", color: macros.goal === k ? "#fff" : "#3a3a3a",
+                  background: macros.goal === k ? O : "#111", color: macros.goal === k ? "#fff" : "#888",
                   border: `1px solid ${macros.goal === k ? O : BORDER}`, borderRadius: 9, padding: "7px 8px",
                   fontSize: 10, fontWeight: 700, cursor: "pointer", transition: "all 0.18s",
                   textAlign: "left", display: "flex", alignItems: "center", gap: 5,
@@ -295,7 +295,7 @@ export default function App() {
 
           {/* Macro rings */}
           <div style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 12, padding: "10px 8px", marginBottom: 10 }}>
-            <div style={{ fontSize: 8, color: "#2a2a2a", letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 700, marginBottom: 10 }}>Still Needed Today</div>
+            <div style={{ fontSize: 9, color: "#666", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 10 }}>Still Needed Today</div>
             <div style={{ display: "flex", justifyContent: "space-around" }}>
               <Ring label="Protein" val={rem.p} max={macros.protein} color="#4ade80"/>
               <Ring label="Carbs" val={rem.c} max={macros.carbs} color="#60a5fa"/>
@@ -318,11 +318,11 @@ export default function App() {
             ]},
           ].map(({ label, items }) => (
             <div key={label} style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 12, padding: "10px 12px", marginBottom: 8 }}>
-              <div style={{ fontSize: 8, color: "#2a2a2a", letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 700, marginBottom: 10 }}>{label}</div>
+              <div style={{ fontSize: 9, color: "#666", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 10 }}>{label}</div>
               {items.map(s => (
                 <div key={s.name} style={{ marginBottom: 10 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                    <span style={{ fontSize: 9, color: "#3a3a3a", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>{s.name}</span>
+                    <span style={{ fontSize: 10, color: "#888", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>{s.name}</span>
                     <span style={{ fontFamily: "'Space Grotesk',monospace", fontSize: 11, fontWeight: 700, color: s.color }}>{s.val}g</span>
                   </div>
                   <input type="range" min={20} max={s.max} value={s.val} onChange={e => s.fn(+e.target.value)} style={{ width: "100%", accentColor: s.color, height: 3 }}/>
@@ -358,13 +358,13 @@ export default function App() {
 
         {/* Chat header */}
         <div style={{ padding: "13px 20px", borderBottom: `1px solid ${BORDER}`, flexShrink: 0, background: "#080808" }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: "#2a2a2a", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#777", letterSpacing: "0.06em", textTransform: "uppercase" }}>
             {started ? `${GOALS[macros.goal]} · Macro-Aware Agent` : "Set macros on the left → hit Find My Meals"}
           </div>
           {agent.toolActivity && (
             <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 4 }}>
               <div style={{ width: 4, height: 4, borderRadius: "50%", background: O, animation: "demoPulse 0.8s infinite" }}/>
-              <span style={{ fontSize: 9, color: "#3a3a3a", fontFamily: "'Space Grotesk',monospace" }}>{agent.toolActivity}</span>
+              <span style={{ fontSize: 9, color: "#666", fontFamily: "'Space Grotesk',monospace" }}>{agent.toolActivity}</span>
             </div>
           )}
         </div>
@@ -374,7 +374,7 @@ export default function App() {
           {!started ? (
             <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, opacity: 0.3 }}>
               <div style={{ fontSize: 52 }}>🍽</div>
-              <div style={{ fontSize: 12, color: "#333", textAlign: "center", fontFamily: "'Space Grotesk',sans-serif", lineHeight: 1.6 }}>Configure your macros<br/>and hit Find My Meals →</div>
+              <div style={{ fontSize: 12, color: "#555", textAlign: "center", fontFamily: "'Space Grotesk',sans-serif", lineHeight: 1.6 }}>Configure your macros<br/>and hit Find My Meals →</div>
             </div>
           ) : (
             agent.messages.map((m, i) => (
@@ -391,7 +391,7 @@ export default function App() {
         {started && agent.messages.length <= 2 && !agent.loading && (
           <div style={{ padding: "0 20px 8px", display: "flex", gap: 5, flexWrap: "wrap", flexShrink: 0 }}>
             {QUICK_PROMPTS.map(q => (
-              <button key={q.text} className="qp" onClick={() => send(q.text)} style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 99, padding: "5px 11px", fontSize: 10, color: "#3a3a3a", cursor: "pointer", transition: "all 0.15s", fontFamily: "inherit" }}>{q.label}</button>
+              <button key={q.text} className="qp" onClick={() => send(q.text)} style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 99, padding: "5px 11px", fontSize: 10, color: "#777", cursor: "pointer", transition: "all 0.15s", fontFamily: "inherit" }}>{q.label}</button>
             ))}
           </div>
         )}
