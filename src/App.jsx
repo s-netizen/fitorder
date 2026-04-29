@@ -507,62 +507,92 @@ export default function App() {
           ))}
         </div>
 
-        {/* Chat header */}
-        <div style={{ padding: "13px 20px", borderBottom: `1px solid ${BORDER}`, flexShrink: 0, background: "#080808" }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "#777", letterSpacing: "0.06em", textTransform: "uppercase" }}>
-            {started ? `${GOALS[macros.goal]} · Macro-Aware Agent` : "Set macros on the left → hit Find My Meals"}
-          </div>
+        {/* Tab bar */}
+        <div style={{ display: "flex", borderBottom: `1px solid ${BORDER}`, flexShrink: 0, background: "#080808", padding: "0 4px" }}>
+          {[
+            { id: "chat", label: "💬 Chat" },
+            { id: "week", label: "📅 Week Plan" },
+            { id: "budget", label: "💰 Budget" },
+            { id: "coach", label: "👤 Coach" },
+          ].map(tab => (
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
+              background: "none", border: "none",
+              borderBottom: activeTab === tab.id ? `2px solid ${O}` : "2px solid transparent",
+              color: activeTab === tab.id ? "#fff" : "#444",
+              padding: "12px 16px", fontSize: 12, fontWeight: 700,
+              cursor: "pointer", fontFamily: "inherit", transition: "color 0.15s",
+              marginBottom: -1,
+            }}>{tab.label}</button>
+          ))}
           {agent.toolActivity && (
-            <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 4 }}>
+            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 5, padding: "0 16px" }}>
               <div style={{ width: 4, height: 4, borderRadius: "50%", background: O, animation: "demoPulse 0.8s infinite" }}/>
-              <span style={{ fontSize: 9, color: "#666", fontFamily: "'Space Grotesk',monospace" }}>{agent.toolActivity}</span>
+              <span style={{ fontSize: 9, color: "#444", fontFamily: "'Space Grotesk',monospace" }}>{agent.toolActivity}</span>
             </div>
           )}
         </div>
 
-        {/* Messages */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "14px 20px", position: "relative", zIndex: 1 }}>
-          {!started ? (
-            <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, opacity: 0.3 }}>
-              <div style={{ fontSize: 52 }}>🍽</div>
-              <div style={{ fontSize: 12, color: "#555", textAlign: "center", fontFamily: "'Space Grotesk',sans-serif", lineHeight: 1.6 }}>Configure your macros<br/>and hit Find My Meals →</div>
+        {/* Tab content */}
+        {activeTab === "chat" && (
+          <>
+            <div style={{ flex: 1, overflowY: "auto", padding: "14px 20px", position: "relative", zIndex: 1 }}>
+              {!started ? (
+                <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, opacity: 0.3 }}>
+                  <div style={{ fontSize: 52 }}>🍽</div>
+                  <div style={{ fontSize: 12, color: "#333", textAlign: "center", fontFamily: "'Space Grotesk',sans-serif", lineHeight: 1.6 }}>Configure your macros<br/>and hit Find My Meals →</div>
+                </div>
+              ) : (
+                agent.messages.map((m, i) => (
+                  <div key={i} style={{ animation: "fadeIn 0.3s ease-out" }}>
+                    <Bubble msg={m} onAdd={name => send(`Add ${name} to my cart`)}/>
+                  </div>
+                ))
+              )}
+              {agent.loading && <TypingDots/>}
+              <div ref={chatEnd}/>
             </div>
-          ) : (
-            agent.messages.map((m, i) => (
-              <div key={i} style={{ animation: "fadeIn 0.3s ease-out" }}>
-                <Bubble msg={m} onAdd={name => send(`Add ${name} to my cart`)}/>
+            {started && agent.messages.length <= 2 && !agent.loading && (
+              <div style={{ padding: "0 20px 8px", display: "flex", gap: 5, flexWrap: "wrap", flexShrink: 0 }}>
+                {QUICK_PROMPTS.map(q => (
+                  <button key={q.text} className="qp" onClick={() => send(q.text)} style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 99, padding: "5px 11px", fontSize: 10, color: "#777", cursor: "pointer", transition: "all 0.15s", fontFamily: "inherit" }}>{q.label}</button>
+                ))}
               </div>
-            ))
-          )}
-          {agent.loading && <TypingDots/>}
-          <div ref={chatEnd}/>
-        </div>
-
-        {/* Quick prompts */}
-        {started && agent.messages.length <= 2 && !agent.loading && (
-          <div style={{ padding: "0 20px 8px", display: "flex", gap: 5, flexWrap: "wrap", flexShrink: 0 }}>
-            {QUICK_PROMPTS.map(q => (
-              <button key={q.text} className="qp" onClick={() => send(q.text)} style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 99, padding: "5px 11px", fontSize: 10, color: "#777", cursor: "pointer", transition: "all 0.15s", fontFamily: "inherit" }}>{q.label}</button>
-            ))}
+            )}
+            <div style={{ padding: "11px 20px", borderTop: `1px solid ${BORDER}`, display: "flex", gap: 8, flexShrink: 0, background: "#080808" }}>
+              <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()}
+                placeholder={started ? "Ask about meals, macros, or 'add to cart'…" : "Set your macros first →"}
+                disabled={!started}
+                style={{ flex: 1, background: "#111", border: `1px solid ${BORDER}`, borderRadius: 11, padding: "10px 15px", color: "#fff", fontSize: 13, opacity: started ? 1 : 0.4 }}/>
+              <button onClick={() => send()} disabled={agent.loading || !input.trim() || !started} style={{
+                width: 42, height: 42, flexShrink: 0,
+                background: !agent.loading && input.trim() && started ? O : "#111",
+                border: `1px solid ${!agent.loading && input.trim() && started ? O : BORDER}`,
+                borderRadius: 10, fontSize: 17, cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "all 0.2s",
+                boxShadow: !agent.loading && input.trim() && started ? `0 4px 16px ${O}44` : "none",
+              }}>→</button>
+            </div>
+          </>
+        )}
+        {activeTab === "week" && (
+          <div style={{ flex: 1, overflow: "hidden" }}>
+            <WeekPlan macros={macros} />
           </div>
         )}
-
-        {/* Input */}
-        <div style={{ padding: "11px 20px", borderTop: `1px solid ${BORDER}`, display: "flex", gap: 8, flexShrink: 0, background: "#080808" }}>
-          <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()}
-            placeholder={started ? "Ask about meals, macros, or 'add to cart'…" : "Set your macros first →"}
-            disabled={!started}
-            style={{ flex: 1, background: "#111", border: `1px solid ${BORDER}`, borderRadius: 11, padding: "10px 15px", color: "#fff", fontSize: 13, opacity: started ? 1 : 0.4 }}/>
-          <button onClick={() => send()} disabled={agent.loading || !input.trim() || !started} style={{
-            width: 42, height: 42, flexShrink: 0,
-            background: !agent.loading && input.trim() && started ? O : "#111",
-            border: `1px solid ${!agent.loading && input.trim() && started ? O : BORDER}`,
-            borderRadius: 10, fontSize: 17, cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            transition: "all 0.2s",
-            boxShadow: !agent.loading && input.trim() && started ? `0 4px 16px ${O}44` : "none",
-          }}>→</button>
-        </div>
+        {activeTab === "budget" && (
+          <div style={{ flex: 1, overflow: "hidden" }}>
+            <Budget macros={macros} />
+          </div>
+        )}
+        {activeTab === "coach" && (
+          <div style={{ flex: 1, overflow: "hidden" }}>
+            <Coach macros={macros} onApplyTargets={(targets) => {
+              setMacros(m => ({ ...m, protein: targets.protein, carbs: targets.carbs, fat: targets.fat, goal: targets.goal }));
+              setActiveTab("chat");
+            }} />
+          </div>
+        )}
       </div>
     </div>
   );
