@@ -65,7 +65,7 @@ function Ring({ label, val, max, color, size = 54 }) {
         </svg>
         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
           <div style={{ fontSize: 15, fontWeight: 800, fontFamily: "'Space Grotesk',sans-serif", color, lineHeight: 1 }}>{val}</div>
-          <div style={{ fontSize: 9, color: "#444" }}>/{max}</div>
+          <div style={{ fontSize: 10, color: "#fff", fontWeight: 600 }}>/{max}</div>
         </div>
       </div>
       <div style={{ fontSize: 12, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700, marginTop: 5 }}>{label}</div>
