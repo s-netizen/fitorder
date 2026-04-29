@@ -1,4 +1,3 @@
-// src/App.jsx
 import { useState } from "react";
 import MacroSetup from "./components/MacroSetup.jsx";
 import Chat from "./components/Chat.jsx";
@@ -12,10 +11,7 @@ export default function App() {
   function handleStart(selectedMacros, openingMessage) {
     setMacros(selectedMacros);
     setView("chat");
-    // Small delay to let macros propagate before agent call
-    setTimeout(() => {
-      agent.startSession(openingMessage);
-    }, 100);
+    setTimeout(() => agent.startSession(openingMessage), 100);
   }
 
   function handleReset() {
@@ -24,9 +20,7 @@ export default function App() {
     setMacros(null);
   }
 
-  if (view === "setup") {
-    return <MacroSetup onStart={handleStart} />;
-  }
+  if (view === "setup") return <MacroSetup onStart={handleStart} />;
 
   return (
     <Chat
@@ -34,6 +28,7 @@ export default function App() {
       messages={agent.messages}
       loading={agent.loading}
       toolActivity={agent.toolActivity}
+      mode={agent.mode}
       onSend={agent.sendMessage}
       onReset={handleReset}
     />

@@ -16,6 +16,35 @@ const QUICK_PROMPTS = [
   "Stay under ₹250 total",
 ];
 
+// Simple markdown renderer for bold, bullets, line breaks
+function renderMarkdown(text) {
+  return text
+    .split("\n")
+    .map((line, i) => {
+      // Bold: **text**
+      const parts = line.split(/\*\*(.*?)\*\*/g).map((part, j) =>
+        j % 2 === 1 ? <strong key={j} style={{ color: "#fff", fontWeight: 700 }}>{part}</strong> : part
+      );
+      // Bullet lines
+      const isBullet = line.trimStart().startsWith("- ") || line.trimStart().startsWith("* ");
+      const isNumbered = /^\d+\./.test(line.trim());
+
+      if (isBullet) {
+        return (
+          <div key={i} style={{ display: "flex", gap: 8, marginBottom: 4 }}>
+            <span style={{ color: O, flexShrink: 0, marginTop: 1 }}>·</span>
+            <span>{parts}</span>
+          </div>
+        );
+      }
+      if (isNumbered) {
+        return <div key={i} style={{ marginBottom: 6 }}>{parts}</div>;
+      }
+      if (line.trim() === "") return <div key={i} style={{ height: 8 }} />;
+      return <div key={i} style={{ marginBottom: 3 }}>{parts}</div>;
+    });
+}
+
 function TypingDots() {
   return (
     <div style={{
@@ -50,7 +79,7 @@ function Bubble({ msg }) {
         }}>⚡</div>
       )}
       <div style={{
-        maxWidth: "78%",
+        maxWidth: "80%",
         background: isUser ? O : CARD,
         border: isUser ? "none" : `1px solid ${BORDER}`,
         borderRadius: isUser ? "16px 16px 4px 16px" : "4px 16px 16px 16px",
@@ -58,13 +87,14 @@ function Bubble({ msg }) {
         fontSize: 13, lineHeight: 1.75,
         color: isUser ? "#fff" : "#ccc",
         fontFamily: "'DM Sans',sans-serif",
-        whiteSpace: "pre-wrap",
-      }}>{msg.content}</div>
+      }}>
+        {isUser ? msg.content : renderMarkdown(msg.content)}
+      </div>
     </div>
   );
 }
 
-export default function Chat({ macros, messages, loading, toolActivity, onSend, onReset }) {
+export default function Chat({ macros, messages, loading, toolActivity, mode, onSend, onReset }) {
   const [input, setInput] = useState("");
   const chatEnd = useRef(null);
 
@@ -84,9 +114,12 @@ export default function Chat({ macros, messages, loading, toolActivity, onSend, 
     f: macros.fat - macros.consumed.fat,
   };
 
+  const isDemo = mode && mode.startsWith("demo");
+
   return (
     <div style={{ height: "100vh", background: BG, fontFamily: "'DM Sans',sans-serif", color: "#fff", display: "flex", flexDirection: "column" }}>
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500;700&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         input, button { font-family: inherit; }
         input:focus { outline: none; }
@@ -108,13 +141,34 @@ export default function Chat({ macros, messages, loading, toolActivity, onSend, 
           <div>
             <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: "-0.02em" }}>FitOrder</div>
             <div style={{ fontSize: 9, color: "#333", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-              {GOALS[macros.goal]} · Live Swiggy MCP
+              {GOALS[macros.goal]} · {mode === "live" ? "Live Swiggy MCP" : "Swiggy MCP Demo"}
             </div>
           </div>
         </div>
 
-        {/* Macro remaining pills */}
         <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
+          {/* Demo badge */}
+          {isDemo && (
+            <div style={{
+              fontSize: 9, fontWeight: 700, letterSpacing: "0.08em",
+              background: "#1a1200", border: "1px solid #3a2800",
+              color: "#f59e0b", borderRadius: 99, padding: "3px 8px",
+              textTransform: "uppercase",
+            }}>Demo</div>
+          )}
+          {mode === "live" && (
+            <div style={{
+              fontSize: 9, fontWeight: 700, letterSpacing: "0.08em",
+              background: "#0a1f0a", border: "1px solid #1a3a1a",
+              color: "#4ade80", borderRadius: 99, padding: "3px 8px",
+              textTransform: "uppercase", display: "flex", alignItems: "center", gap: 4,
+            }}>
+              <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#4ade80" }} />
+              Live
+            </div>
+          )}
+
+          {/* Macro pills */}
           {[
             { l: "P", v: rem.p, c: "#4ade80" },
             { l: "C", v: rem.c, c: "#60a5fa" },
@@ -132,7 +186,7 @@ export default function Chat({ macros, messages, loading, toolActivity, onSend, 
           <button onClick={onReset} style={{
             background: "#161616", border: `1px solid ${BORDER}`,
             color: "#444", borderRadius: 7, padding: "4px 10px",
-            fontSize: 11, cursor: "pointer", marginLeft: 4,
+            fontSize: 11, cursor: "pointer", marginLeft: 2,
           }}>← Back</button>
         </div>
       </div>
@@ -140,7 +194,7 @@ export default function Chat({ macros, messages, loading, toolActivity, onSend, 
       {/* Tool activity bar */}
       {toolActivity && (
         <div style={{
-          padding: "6px 16px", background: "#0d0d0d",
+          padding: "6px 16px", background: "#0a0a0a",
           borderBottom: `1px solid ${BORDER}`,
           display: "flex", alignItems: "center", gap: 8,
         }}>
@@ -153,26 +207,18 @@ export default function Chat({ macros, messages, loading, toolActivity, onSend, 
       {/* Messages */}
       <div style={{ flex: 1, overflowY: "auto", padding: "16px" }}>
         {messages.map((m, i) => <Bubble key={i} msg={m} />)}
-        {loading && (
-          <div style={{ marginTop: 6 }}>
-            <TypingDots />
-          </div>
-        )}
+        {loading && <div style={{ marginTop: 6 }}><TypingDots /></div>}
         <div ref={chatEnd} />
       </div>
 
-      {/* Quick prompts — show only early in conversation */}
+      {/* Quick prompts */}
       {messages.length > 0 && messages.length <= 2 && !loading && (
-        <div style={{
-          padding: "0 16px 10px",
-          display: "flex", gap: 6, flexWrap: "wrap",
-        }}>
+        <div style={{ padding: "0 16px 10px", display: "flex", gap: 6, flexWrap: "wrap" }}>
           {QUICK_PROMPTS.map(q => (
             <button key={q} onClick={() => onSend(q)} style={{
               background: "#121212", border: `1px solid ${BORDER}`,
               borderRadius: 99, padding: "6px 12px",
-              fontSize: 11, color: "#555", cursor: "pointer",
-              fontFamily: "inherit", transition: "color 0.15s",
+              fontSize: 11, color: "#555", cursor: "pointer", fontFamily: "inherit",
             }}>{q}</button>
           ))}
         </div>
@@ -197,8 +243,8 @@ export default function Chat({ macros, messages, loading, toolActivity, onSend, 
         <button onClick={send} disabled={loading || !input.trim()} style={{
           width: 46, height: 46, flexShrink: 0,
           background: loading || !input.trim() ? "#1a1a1a" : O,
-          border: "none", borderRadius: 12,
-          fontSize: 18, cursor: loading ? "default" : "pointer",
+          border: "none", borderRadius: 12, fontSize: 18,
+          cursor: loading ? "default" : "pointer",
           display: "flex", alignItems: "center", justifyContent: "center",
           transition: "background 0.2s",
         }}>→</button>
