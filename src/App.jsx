@@ -15,10 +15,9 @@ const QUICK_PROMPTS = [
   { label: "🥦 Veg only", text: "Show me vegetarian options only" },
   { label: "💊 Instamart protein", text: "Check Instamart for protein supplements" },
   { label: "💰 Under ₹250", text: "Find options under ₹250" },
-  { label: "🔄 Reorder past meal", text: "Show my past Swiggy orders and suggest which one fits my macros best today" },
+  { label: "🔄 Reorder", text: "Show my past Swiggy orders and suggest which one fits my macros best today" },
 ];
 
-// TDEE Calculator
 function calcTDEE(weight, height, age, gender, activity, goal) {
   const bmr = gender === "male"
     ? 10 * weight + 6.25 * height - 5 * age + 5
@@ -33,7 +32,7 @@ function calcTDEE(weight, height, age, gender, activity, goal) {
   return { calories, protein: Math.max(protein, 80), carbs: Math.max(carbs, 50), fat: Math.max(fat, 30) };
 }
 
-function Scooter({ size = 90 }) {
+function Scooter({ size = 70 }) {
   return (
     <svg width={size} height={size * 0.6} viewBox="0 0 120 66" fill="none">
       <style>{`
@@ -42,21 +41,18 @@ function Scooter({ size = 90 }) {
         .sb{animation:bob 2.2s ease-in-out infinite}
         .sl1{animation:sl 0.7s ease-out infinite}
         .sl2{animation:sl 0.7s ease-out 0.15s infinite}
-        .sl3{animation:sl 0.7s ease-out 0.3s infinite}
         @keyframes spin{to{transform:rotate(360deg)}}
         @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
         @keyframes sl{0%{opacity:0.8;transform:translateX(0)}100%{opacity:0;transform:translateX(-18px)}}
       `}</style>
       <line className="sl1" x1="2" y1="34" x2="18" y2="34" stroke={O} strokeWidth="2" strokeLinecap="round"/>
       <line className="sl2" x1="2" y1="40" x2="12" y2="40" stroke={O} strokeWidth="1.5" strokeLinecap="round" opacity="0.6"/>
-      <line className="sl3" x1="2" y1="28" x2="8" y2="28" stroke={O} strokeWidth="1" strokeLinecap="round" opacity="0.4"/>
       <g className="sb">
         <circle className="wb" cx="28" cy="50" r="11" stroke="#2a2a2a" strokeWidth="2.5" fill="#141414"/>
         <circle cx="28" cy="50" r="4" fill="#2a2a2a"/>
         <path d="M28 42 Q42 22 62 24 L78 24 L83 32 L88 32 Q93 32 95 38 L97 38" stroke={O} strokeWidth="3" fill="none" strokeLinecap="round"/>
         <path d="M62 24 L60 40 L83 40 L83 32" fill="#141414" stroke="#222" strokeWidth="1.5"/>
         <rect x="60" y="10" width="22" height="18" rx="3" fill={O} opacity="0.95"/>
-        <line x1="60" y1="19" x2="82" y2="19" stroke="rgba(255,255,255,0.3)" strokeWidth="1"/>
         <text x="71" y="23" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">⚡</text>
         <circle className="wf" cx="95" cy="50" r="11" stroke="#2a2a2a" strokeWidth="2.5" fill="#141414"/>
         <circle cx="95" cy="50" r="4" fill="#2a2a2a"/>
@@ -69,7 +65,7 @@ function Scooter({ size = 90 }) {
   );
 }
 
-function Ring({ label, val, max, color, size = 54 }) {
+function Ring({ label, val, max, color, size = 58 }) {
   const r = size / 2 - 5;
   const circ = 2 * Math.PI * r;
   const pct = Math.min(val / (max || 1), 1);
@@ -83,11 +79,11 @@ function Ring({ label, val, max, color, size = 54 }) {
             style={{ transition: "stroke-dasharray 0.5s cubic-bezier(0.34,1.56,0.64,1)" }}/>
         </svg>
         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ fontSize: 15, fontWeight: 800, fontFamily: "'Space Grotesk',sans-serif", color, lineHeight: 1 }}>{val}</div>
-          <div style={{ fontSize: 10, color: "#fff", fontWeight: 600 }}>/{max}</div>
+          <div style={{ fontSize: 13, fontWeight: 800, fontFamily: "'Space Grotesk',sans-serif", color, lineHeight: 1 }}>{val}</div>
+          <div style={{ fontSize: 8, color: "#333" }}>/{max}</div>
         </div>
       </div>
-      <div style={{ fontSize: 12, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700, marginTop: 5 }}>{label}</div>
+      <div style={{ fontSize: 9, color: "#fff", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700, marginTop: 5 }}>{label}</div>
     </div>
   );
 }
@@ -97,7 +93,7 @@ function MealCard({ name, restaurant, protein, carbs, fat, price, eta, score, so
   const isInsta = source === "Instamart" || restaurant === "Instamart";
   function handleAdd() { setAdded(true); onAdd?.(name); setTimeout(() => setAdded(false), 2500); }
   return (
-    <div style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "16px 18px", marginBottom: 10, position: "relative", overflow: "hidden" }}>
+    <div style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 12, padding: "10px 12px", marginBottom: 8, position: "relative", overflow: "hidden" }}>
       {score >= 85 && <div style={{ position: "absolute", top: 0, right: 0, background: O, fontSize: 7, fontWeight: 800, color: "#fff", padding: "2px 8px", borderBottomLeftRadius: 6, letterSpacing: "0.1em" }}>TOP PICK</div>}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -117,7 +113,7 @@ function MealCard({ name, restaurant, protein, carbs, fat, price, eta, score, so
           <div style={{ fontSize: 7, color: "#333", letterSpacing: "0.08em" }}>MATCH</div>
         </div>}
       </div>
-      <div style={{ display: "flex", gap: 4, marginBottom: 8 }}>
+      <div style={{ display: "flex", gap: 4, marginBottom: 8, flexWrap: "wrap" }}>
         {[["P", protein, "#4ade80"], ["C", carbs, "#60a5fa"], ["F", fat, O]].map(([l, v, c]) => (
           <div key={l} style={{ background: "#1a1a1a", borderRadius: 6, padding: "3px 7px", display: "flex", gap: 3, alignItems: "center" }}>
             <div style={{ width: 5, height: 5, borderRadius: "50%", background: c }}/>
@@ -188,7 +184,7 @@ function AgentMsg({ content, onAdd }) {
   }).join("\n").trim();
   return (
     <div>
-      {textOnly && <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: "4px 14px 14px 14px", padding: "10px 14px", marginBottom: cards.length ? 8 : 0, fontSize: 12.5, color: "#aaa", fontFamily: "'DM Sans',sans-serif", lineHeight: 1.7 }}>{renderMd(textOnly)}</div>}
+      {textOnly && <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: "4px 14px 14px 14px", padding: "10px 14px", marginBottom: cards.length ? 8 : 0, fontSize: 13, color: "#aaa", fontFamily: "'DM Sans',sans-serif", lineHeight: 1.7 }}>{renderMd(textOnly)}</div>}
       {cards.map((c, i) => <MealCard key={i} {...c} onAdd={onAdd}/>)}
     </div>
   );
@@ -198,12 +194,12 @@ function Bubble({ msg, onAdd }) {
   const isUser = msg.role === "user";
   if (isUser) return (
     <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
-      <div style={{ maxWidth: "80%", background: O, borderRadius: "14px 14px 4px 14px", padding: "10px 14px", fontSize: 12.5, color: "#fff", fontFamily: "'DM Sans',sans-serif", lineHeight: 1.6 }}>{msg.content}</div>
+      <div style={{ maxWidth: "82%", background: O, borderRadius: "14px 14px 4px 14px", padding: "10px 14px", fontSize: 13, color: "#fff", fontFamily: "'DM Sans',sans-serif", lineHeight: 1.6 }}>{msg.content}</div>
     </div>
   );
   return (
     <div style={{ display: "flex", gap: 8, marginBottom: 8, alignItems: "flex-start" }}>
-      <div style={{ width: 26, height: 26, borderRadius: 7, background: O, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0, marginTop: 1, boxShadow: `0 0 10px ${O}44` }}>⚡</div>
+      <div style={{ width: 26, height: 26, borderRadius: 7, background: O, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0, marginTop: 1 }}>⚡</div>
       <div style={{ flex: 1 }}><AgentMsg content={msg.content} onAdd={onAdd}/></div>
     </div>
   );
@@ -221,29 +217,194 @@ function TypingDots() {
   );
 }
 
-export default function App() {
-  const [macros, setMacros] = useState({ goal: "recomp", protein: 160, carbs: 180, fat: 60, consumed: { protein: 85, carbs: 90, fat: 32 } });
-  const [macroMode, setMacroMode] = useState("manual"); // "manual" | "calculate"
-  const [body, setBody] = useState({ weight: 75, height: 175, age: 28, gender: "male", activity: "moderate" });
-  const [started, setStarted] = useState(false);
-  const [activeTab, setActiveTab] = useState("chat");
-  const [input, setInput] = useState("");
-  const agent = useAgent(macros);
-  const chatEnd = useRef(null);
-
+// ── Setup panel content (shared between mobile and desktop) ─────────────────
+function SetupPanel({ macros, setMacros, macroMode, setMacroMode, body, setBody, onStart, started, isMobile }) {
   const rem = {
     p: Math.max(macros.protein - macros.consumed.protein, 0),
     c: Math.max(macros.carbs - macros.consumed.carbs, 0),
     f: Math.max(macros.fat - macros.consumed.fat, 0),
   };
+  const setM = (key) => (v) => setMacros(m => ({ ...m, [key]: v }));
+  const setC = (key) => (v) => setMacros(m => ({ ...m, consumed: { ...m.consumed, [key]: v } }));
 
+  const Slider = ({ label, val, max, color, onChange }) => (
+    <div style={{ marginBottom: 14 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+        <span style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>{label}</span>
+        <span style={{ fontFamily: "'Space Grotesk',monospace", fontSize: 13, fontWeight: 700, color }}>{val}g</span>
+      </div>
+      <input type="range" min={20} max={max} value={val} onChange={e => onChange(+e.target.value)} style={{ width: "100%", accentColor: color, height: 3 }}/>
+    </div>
+  );
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
+      {/* Header */}
+      <div style={{ padding: isMobile ? "14px 16px 12px" : "18px 22px 14px", borderBottom: `1px solid ${BORDER}`, flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <Scooter size={isMobile ? 52 : 64}/>
+            <div>
+              <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 800, fontFamily: "'Space Grotesk',sans-serif", letterSpacing: "-0.04em", lineHeight: 1 }}>Fit<span style={{ color: O }}>Order</span></div>
+              <div style={{ fontSize: 9, color: "#555", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginTop: 3 }}>Swiggy Builders Club</div>
+            </div>
+          </div>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#110a00", border: "1px solid #2a1800", borderRadius: 99, padding: "4px 10px", flexShrink: 0 }}>
+            <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#f59e0b", animation: "demoPulse 1.5s infinite" }}/>
+            <span style={{ fontSize: 9, color: "#f59e0b", fontWeight: 700, letterSpacing: "0.06em" }}>{isMobile ? "DEMO" : "DEMO · Food + Instamart MCP"}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Scrollable content */}
+      <div style={{ flex: 1, overflowY: "auto", padding: isMobile ? "12px 16px" : "14px 22px" }}>
+        {/* Goal */}
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 10, color: "#888", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 8 }}>Goal</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+            {Object.entries(GOALS).map(([k, v]) => (
+              <button key={k} onClick={() => setMacros(m => ({ ...m, goal: k }))} style={{
+                background: macros.goal === k ? O : "#111", color: macros.goal === k ? "#fff" : "#888",
+                border: `1px solid ${macros.goal === k ? O : BORDER}`, borderRadius: 10, padding: "10px 10px",
+                fontSize: 12, fontWeight: 700, cursor: "pointer", transition: "all 0.18s",
+                textAlign: "left", display: "flex", alignItems: "center", gap: 7, fontFamily: "inherit",
+              }}>
+                <span style={{ fontSize: 15 }}>{GOAL_ICONS[k]}</span><span>{v}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Macro rings */}
+        <div style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "12px 10px", marginBottom: 12 }}>
+          <div style={{ fontSize: 10, color: "#888", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 12 }}>Still Needed Today</div>
+          <div style={{ display: "flex", justifyContent: "space-around" }}>
+            <Ring label="Protein" val={rem.p} max={macros.protein} color="#4ade80" size={isMobile ? 54 : 58}/>
+            <Ring label="Carbs" val={rem.c} max={macros.carbs} color="#60a5fa" size={isMobile ? 54 : 58}/>
+            <Ring label="Fat" val={rem.f} max={macros.fat} color={O} size={isMobile ? 54 : 58}/>
+            <Ring label="kcal" val={rem.p*4+rem.c*4+rem.f*9} max={macros.protein*4+macros.carbs*4+macros.fat*9} color="#c084fc" size={isMobile ? 54 : 58}/>
+          </div>
+        </div>
+
+        {/* Mode toggle */}
+        <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
+          {[["manual", "✏️ Set Manually"], ["calculate", "📐 Calculate for Me"]].map(([mode, label]) => (
+            <button key={mode} onClick={() => {
+              setMacroMode(mode);
+              if (mode === "calculate") {
+                const calc = calcTDEE(body.weight, body.height, body.age, body.gender, body.activity, macros.goal);
+                setMacros(m => ({ ...m, protein: calc.protein, carbs: calc.carbs, fat: calc.fat }));
+              }
+            }} style={{
+              flex: 1, background: macroMode === mode ? O : "#111",
+              color: macroMode === mode ? "#fff" : "#666",
+              border: `1px solid ${macroMode === mode ? O : BORDER}`,
+              borderRadius: 9, padding: "8px 6px", fontSize: 11, fontWeight: 700,
+              cursor: "pointer", transition: "all 0.18s", fontFamily: "inherit",
+            }}>{label}</button>
+          ))}
+        </div>
+
+        {/* TDEE */}
+        {macroMode === "calculate" && (
+          <div style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "14px 16px", marginBottom: 10 }}>
+            <div style={{ fontSize: 10, color: "#888", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 12 }}>Body Stats</div>
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ fontSize: 11, color: "#aaa", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 7 }}>Gender</div>
+              <div style={{ display: "flex", gap: 6 }}>
+                {[["male", "♂ Male"], ["female", "♀ Female"]].map(([g, label]) => (
+                  <button key={g} onClick={() => {
+                    const nb = { ...body, gender: g };
+                    setBody(nb);
+                    const calc = calcTDEE(nb.weight, nb.height, nb.age, g, nb.activity, macros.goal);
+                    setMacros(m => ({ ...m, protein: calc.protein, carbs: calc.carbs, fat: calc.fat }));
+                  }} style={{ flex: 1, background: body.gender === g ? "#1a1a2e" : "#111", color: body.gender === g ? "#818cf8" : "#555", border: `1px solid ${body.gender === g ? "#818cf8" : BORDER}`, borderRadius: 8, padding: "8px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s" }}>{label}</button>
+                ))}
+              </div>
+            </div>
+            {[
+              { name: "Weight", unit: "kg", val: body.weight, min: 40, max: 150, key: "weight" },
+              { name: "Height", unit: "cm", val: body.height, min: 140, max: 220, key: "height" },
+              { name: "Age", unit: "yrs", val: body.age, min: 16, max: 70, key: "age" },
+            ].map(s => (
+              <div key={s.key} style={{ marginBottom: 10 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                  <span style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 }}>{s.name}</span>
+                  <span style={{ fontFamily: "'Space Grotesk',monospace", fontSize: 12, fontWeight: 700, color: "#fff" }}>{s.val}{s.unit}</span>
+                </div>
+                <input type="range" min={s.min} max={s.max} value={s.val} onChange={e => {
+                  const nb = { ...body, [s.key]: +e.target.value };
+                  setBody(nb);
+                  const calc = calcTDEE(nb.weight, nb.height, nb.age, nb.gender, nb.activity, macros.goal);
+                  setMacros(m => ({ ...m, protein: calc.protein, carbs: calc.carbs, fat: calc.fat }));
+                }} style={{ width: "100%", accentColor: "#818cf8", height: 3 }}/>
+              </div>
+            ))}
+            <div style={{ marginBottom: 4 }}>
+              <div style={{ fontSize: 11, color: "#aaa", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 7 }}>Activity</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                {[["sedentary","🪑 Sedentary"],["light","🚶 Light"],["moderate","🏃 Moderate"],["active","💪 Active"],["very","🔥 Very Active"]].map(([key, label]) => (
+                  <button key={key} onClick={() => {
+                    const nb = { ...body, activity: key };
+                    setBody(nb);
+                    const calc = calcTDEE(nb.weight, nb.height, nb.age, nb.gender, key, macros.goal);
+                    setMacros(m => ({ ...m, protein: calc.protein, carbs: calc.carbs, fat: calc.fat }));
+                  }} style={{ background: body.activity === key ? "#1a1200" : "#111", color: body.activity === key ? O : "#555", border: `1px solid ${body.activity === key ? O+"55" : BORDER}`, borderRadius: 7, padding: "7px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", textAlign: "left", transition: "all 0.15s" }}>{label}</button>
+                ))}
+              </div>
+            </div>
+            <div style={{ marginTop: 12, background: "#111", border: `1px solid ${O}22`, borderRadius: 10, padding: "10px 12px" }}>
+              <div style={{ fontSize: 9, color: "#555", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>Calculated</div>
+              <div style={{ display: "flex", gap: 10 }}>
+                {[{l:"P",v:macros.protein,c:"#4ade80"},{l:"C",v:macros.carbs,c:"#60a5fa"},{l:"F",v:macros.fat,c:O}].map(m => (
+                  <div key={m.l} style={{ textAlign: "center", flex: 1 }}>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: m.c, fontFamily: "'Space Grotesk',sans-serif" }}>{m.v}g</div>
+                    <div style={{ fontSize: 9, color: "#444", textTransform: "uppercase" }}>{m.l}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Manual sliders */}
+        {macroMode === "manual" && (
+          <div style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "14px 16px", marginBottom: 10 }}>
+            <div style={{ fontSize: 10, color: "#888", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 12 }}>Daily Targets</div>
+            <Slider label="Protein" val={macros.protein} max={300} color="#4ade80" onChange={setM("protein")}/>
+            <Slider label="Carbs" val={macros.carbs} max={400} color="#60a5fa" onChange={setM("carbs")}/>
+            <Slider label="Fat" val={macros.fat} max={150} color={O} onChange={setM("fat")}/>
+          </div>
+        )}
+
+        {/* Eaten today */}
+        <div style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "14px 16px", marginBottom: 14 }}>
+          <div style={{ fontSize: 10, color: "#888", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 12 }}>Eaten Today</div>
+          <Slider label="Protein" val={macros.consumed.protein} max={macros.protein} color="#4ade80" onChange={setC("protein")}/>
+          <Slider label="Carbs" val={macros.consumed.carbs} max={macros.carbs} color="#60a5fa" onChange={setC("carbs")}/>
+          <Slider label="Fat" val={macros.consumed.fat} max={macros.fat} color={O} onChange={setC("fat")}/>
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div style={{ padding: isMobile ? "12px 16px" : "14px 22px", borderTop: `1px solid ${BORDER}`, flexShrink: 0 }}>
+        <button onClick={onStart} style={{
+          width: "100%", background: O, color: "#fff", border: "none",
+          borderRadius: 12, padding: "14px", fontSize: 14, fontWeight: 800,
+          cursor: "pointer", fontFamily: "inherit", letterSpacing: "0.02em",
+          boxShadow: `0 6px 24px ${O}44`, transition: "all 0.2s",
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+        }}>{started ? "🔄 Refresh Meals" : "⚡ Find My Meals"}</button>
+      </div>
+    </div>
+  );
+}
+
+// ── Chat panel content ──────────────────────────────────────────────────────
+function ChatPanel({ macros, agent, started, activeTab, setActiveTab, isMobile }) {
+  const [input, setInput] = useState("");
+  const chatEnd = useRef(null);
   useEffect(() => { chatEnd.current?.scrollIntoView({ behavior: "smooth" }); }, [agent.messages, agent.loading]);
-
-  function handleStart() {
-    setStarted(true);
-    const opening = `I'm on a ${GOALS[macros.goal]} plan. I still need ${rem.p}g protein, ${rem.c}g carbs, ${rem.f}g fat today. Find me the best high-protein meal options from Swiggy near me and check Instamart too.`;
-    agent.startSession(opening, macros);
-  }
 
   function send(text) {
     const msg = text || input.trim();
@@ -252,11 +413,128 @@ export default function App() {
     setInput("");
   }
 
-  const setM = (key) => (v) => setMacros(m => ({ ...m, [key]: v }));
-  const setC = (key) => (v) => setMacros(m => ({ ...m, consumed: { ...m.consumed, [key]: v } }));
+  const TABS = [
+    { id: "chat", label: isMobile ? "💬" : "💬 Chat" },
+    { id: "week", label: isMobile ? "📅" : "📅 Week Plan" },
+    { id: "budget", label: isMobile ? "💰" : "💰 Budget" },
+    { id: "coach", label: isMobile ? "👤" : "👤 Coach" },
+  ];
 
   return (
-    <div style={{ height: "100vh", width: "100vw", background: BG, display: "flex", fontFamily: "'DM Sans',sans-serif", color: "#fff", overflow: "hidden" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
+      {/* Tab bar */}
+      <div style={{ display: "flex", borderBottom: `1px solid ${BORDER}`, flexShrink: 0, background: BG, padding: "0 4px" }}>
+        {TABS.map(tab => (
+          <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
+            flex: isMobile ? 1 : "none",
+            background: "none", border: "none",
+            borderBottom: activeTab === tab.id ? `2px solid ${O}` : "2px solid transparent",
+            color: activeTab === tab.id ? "#fff" : "#444",
+            padding: isMobile ? "12px 4px" : "12px 16px",
+            fontSize: isMobile ? 18 : 12, fontWeight: 700,
+            cursor: "pointer", fontFamily: "inherit", transition: "color 0.15s",
+            marginBottom: -1, textAlign: "center",
+          }}>{tab.label}</button>
+        ))}
+        {!isMobile && agent.toolActivity && (
+          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 5, padding: "0 16px" }}>
+            <div style={{ width: 4, height: 4, borderRadius: "50%", background: O, animation: "demoPulse 0.8s infinite" }}/>
+            <span style={{ fontSize: 9, color: "#444", fontFamily: "'Space Grotesk',monospace" }}>{agent.toolActivity}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Tool activity - mobile */}
+      {isMobile && agent.toolActivity && (
+        <div style={{ padding: "5px 16px", background: "#0a0a0a", borderBottom: `1px solid ${BORDER}`, display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+          <div style={{ width: 4, height: 4, borderRadius: "50%", background: O, animation: "demoPulse 0.8s infinite" }}/>
+          <span style={{ fontSize: 10, color: "#444", fontFamily: "'Space Grotesk',monospace" }}>{agent.toolActivity}</span>
+        </div>
+      )}
+
+      {/* Tab content */}
+      {activeTab === "chat" && (
+        <>
+          <div style={{ flex: 1, overflowY: "auto", padding: "14px 16px" }}>
+            {!started ? (
+              <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, opacity: 0.3 }}>
+                <div style={{ fontSize: 44 }}>🍽</div>
+                <div style={{ fontSize: 12, color: "#333", textAlign: "center", fontFamily: "'Space Grotesk',sans-serif", lineHeight: 1.6 }}>
+                  {isMobile ? "Tap ⚙ to set macros" : "Configure macros and hit Find My Meals"}
+                </div>
+              </div>
+            ) : (
+              agent.messages.map((m, i) => (
+                <div key={i} style={{ animation: "fadeIn 0.3s ease-out" }}>
+                  <Bubble msg={m} onAdd={name => send(`Add ${name} to my cart`)}/>
+                </div>
+              ))
+            )}
+            {agent.loading && <TypingDots/>}
+            <div ref={chatEnd}/>
+          </div>
+          {started && agent.messages.length <= 2 && !agent.loading && (
+            <div style={{ padding: "0 16px 8px", display: "flex", gap: 5, flexWrap: "wrap", flexShrink: 0 }}>
+              {QUICK_PROMPTS.map(q => (
+                <button key={q.text} onClick={() => send(q.text)} style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 99, padding: "5px 11px", fontSize: 10, color: "#777", cursor: "pointer", fontFamily: "inherit" }}>{q.label}</button>
+              ))}
+            </div>
+          )}
+          <div style={{ padding: "10px 16px", borderTop: `1px solid ${BORDER}`, display: "flex", gap: 8, flexShrink: 0, background: BG }}>
+            <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()}
+              placeholder={started ? "Ask about meals, macros…" : "Set macros first →"}
+              disabled={!started}
+              style={{ flex: 1, background: "#111", border: `1px solid ${BORDER}`, borderRadius: 11, padding: "11px 14px", color: "#fff", fontSize: 13, opacity: started ? 1 : 0.4, fontFamily: "inherit" }}/>
+            <button onClick={() => send()} disabled={agent.loading || !input.trim() || !started} style={{
+              width: 42, height: 42, flexShrink: 0,
+              background: !agent.loading && input.trim() && started ? O : "#111",
+              border: `1px solid ${!agent.loading && input.trim() && started ? O : BORDER}`,
+              borderRadius: 10, fontSize: 17, cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s",
+            }}>→</button>
+          </div>
+        </>
+      )}
+      {activeTab === "week" && <div style={{ flex: 1, overflow: "hidden" }}><WeekPlan macros={macros}/></div>}
+      {activeTab === "budget" && <div style={{ flex: 1, overflow: "hidden" }}><Budget macros={macros}/></div>}
+      {activeTab === "coach" && (
+        <div style={{ flex: 1, overflow: "hidden" }}>
+          <Coach macros={macros} onApplyTargets={(targets) => {
+            setActiveTab("chat");
+          }}/>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Main App ────────────────────────────────────────────────────────────────
+export default function App() {
+  const [macros, setMacros] = useState({ goal: "recomp", protein: 160, carbs: 180, fat: 60, consumed: { protein: 85, carbs: 90, fat: 32 } });
+  const [macroMode, setMacroMode] = useState("manual");
+  const [body, setBody] = useState({ weight: 75, height: 175, age: 28, gender: "male", activity: "moderate" });
+  const [started, setStarted] = useState(false);
+  const [activeTab, setActiveTab] = useState("chat");
+  // mobile: "setup" | "chat"
+  const [mobileView, setMobileView] = useState("setup");
+  const agent = useAgent(macros);
+
+  const rem = {
+    p: Math.max(macros.protein - macros.consumed.protein, 0),
+    c: Math.max(macros.carbs - macros.consumed.carbs, 0),
+    f: Math.max(macros.fat - macros.consumed.fat, 0),
+  };
+
+  function handleStart() {
+    setStarted(true);
+    setMobileView("chat");
+    setActiveTab("chat");
+    const opening = `I'm on a ${GOALS[macros.goal]} plan. I still need ${rem.p}g protein, ${rem.c}g carbs, ${rem.f}g fat today. Find me the best high-protein meal options from Swiggy near me and check Instamart too.`;
+    agent.startSession(opening, macros);
+  }
+
+  return (
+    <div style={{ height: "100dvh", width: "100vw", background: BG, fontFamily: "'DM Sans',sans-serif", color: "#fff", overflow: "hidden" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
         *{box-sizing:border-box;margin:0;padding:0}
@@ -265,337 +543,85 @@ export default function App() {
         input[type=range]{cursor:pointer}
         ::-webkit-scrollbar{width:3px}
         ::-webkit-scrollbar-thumb{background:#1e1e1e;border-radius:99px}
-        .gbtn:hover{transform:translateY(-1px);border-color:#333!important}
-        .sbtn:hover{box-shadow:0 12px 40px rgba(252,128,25,0.55)!important;transform:translateY(-1px)}
-        .qp:hover{border-color:#333!important;color:#777!important}
         @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
         @keyframes glow{0%,100%{opacity:0.12}50%{opacity:0.25}}
-        @keyframes floatIcon{0%{opacity:0;transform:translateY(60px)}15%{opacity:0.045}85%{opacity:0.045}100%{opacity:0;transform:translateY(-70px)}}
         @keyframes demoPulse{0%,100%{opacity:0.5;transform:scale(0.8)}50%{opacity:1;transform:scale(1)}}
+
+        /* ── DESKTOP: side by side ── */
+        .layout-desktop { display: flex; height: 100%; }
+        .panel-left { width: 50%; border-right: 1px solid #1a1a1a; display: flex; flex-direction: column; height: 100%; }
+        .panel-right { flex: 1; display: flex; flex-direction: column; height: 100%; }
+        .mobile-bottom-nav { display: none; }
+
+        /* ── MOBILE: stacked, bottom nav ── */
+        @media (max-width: 768px) {
+          .layout-desktop { flex-direction: column; }
+          .panel-left { width: 100%; border-right: none; border-bottom: none; flex: 1; min-height: 0;
+            display: ${`var(--show-setup, flex)`}; }
+          .panel-right { flex: 1; min-height: 0;
+            display: ${`var(--show-chat, flex)`}; }
+          .mobile-bottom-nav {
+            display: flex; flex-shrink: 0;
+            height: 56px; border-top: 1px solid #1a1a1a;
+            background: #0a0a0a;
+          }
+          .mobile-bottom-nav button {
+            flex: 1; background: none; border: none; color: #444;
+            font-size: 22px; cursor: pointer; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+            gap: 3px; transition: color 0.15s; padding: 0;
+          }
+          .mobile-bottom-nav button span { font-size: 9px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+          .mobile-bottom-nav button.active { color: #FC8019; }
+        }
       `}</style>
 
-      {/* Ambient glow */}
-      <div style={{ position: "fixed", top: "30%", left: "35%", width: 500, height: 500, borderRadius: "50%", background: `radial-gradient(circle, ${O}18 0%, transparent 70%)`, animation: "glow 6s ease-in-out infinite", pointerEvents: "none", zIndex: 0 }}/>
-
-      {/* ── LEFT: Setup panel ─────────────────────────────────────────────── */}
-      <div style={{ width: "50%", flexShrink: 0, borderRight: `1px solid ${BORDER}`, display: "flex", flexDirection: "column", height: "100vh", position: "relative", zIndex: 1, background: "#0a0a0a" }}>
-
-        {/* Logo area */}
-        <div style={{ padding: "18px 22px 14px", borderBottom: `1px solid ${BORDER}`, flexShrink: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <Scooter size={64}/>
-              <div>
-                <div style={{ fontSize: 32, fontWeight: 800, fontFamily: "'Space Grotesk',sans-serif", letterSpacing: "-0.04em", lineHeight: 1 }}>Fit<span style={{ color: O }}>Order</span></div>
-                <div style={{ fontSize: 9, color: "#555", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginTop: 4 }}>Swiggy Builders Club</div>
-              </div>
-            </div>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#110a00", border: "1px solid #2a1800", borderRadius: 99, padding: "4px 10px", flexShrink: 0 }}>
-              <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#f59e0b", animation: "demoPulse 1.5s infinite" }}/>
-              <span style={{ fontSize: 9, color: "#f59e0b", fontWeight: 700, letterSpacing: "0.06em" }}>DEMO · Food + Instamart MCP</span>
-            </div>
-          </div>
+      <div className="layout-desktop" style={{
+        height: "100%",
+        // CSS variables control which panel shows on mobile
+        "--show-setup": mobileView === "setup" ? "flex" : "none",
+        "--show-chat": mobileView === "chat" ? "flex" : "none",
+      }}>
+        <div className="panel-left">
+          <SetupPanel
+            macros={macros} setMacros={setMacros}
+            macroMode={macroMode} setMacroMode={setMacroMode}
+            body={body} setBody={setBody}
+            onStart={handleStart} started={started}
+            isMobile={false}
+          />
         </div>
-
-
-        {/* Scrollable config */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "16px 22px" }}>
-
-          {/* Goal */}
-          <div style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 11, color: "#888", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 10 }}>Goal</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 5 }}>
-              {Object.entries(GOALS).map(([k, v]) => (
-                <button key={k} className="gbtn" onClick={() => setMacros(m => ({ ...m, goal: k }))} style={{
-                  background: macros.goal === k ? O : "#111", color: macros.goal === k ? "#fff" : "#888",
-                  border: `1px solid ${macros.goal === k ? O : BORDER}`, borderRadius: 10, padding: "12px 14px",
-                  fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.18s",
-                  textAlign: "left", display: "flex", alignItems: "center", gap: 8,
-                }}>
-                  <span style={{ fontSize: 16 }}>{GOAL_ICONS[k]}</span><span>{v}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Macro rings */}
-          <div style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "16px 14px", marginBottom: 12 }}>
-            <div style={{ fontSize: 11, color: "#888", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 14 }}>Still Needed Today</div>
-            <div style={{ display: "flex", justifyContent: "space-around" }}>
-              <Ring label="Protein" val={rem.p} max={macros.protein} color="#4ade80" size={68}/>
-              <Ring label="Carbs" val={rem.c} max={macros.carbs} color="#60a5fa" size={68}/>
-              <Ring label="Fat" val={rem.f} max={macros.fat} color={O} size={68}/>
-              <Ring label="kcal" val={rem.p*4+rem.c*4+rem.f*9} max={macros.protein*4+macros.carbs*4+macros.fat*9} color="#c084fc" size={68}/>
-            </div>
-          </div>
-
-          {/* Mode toggle */}
-          <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
-            {[["manual", "✏️ Set Manually"], ["calculate", "📐 Calculate for Me"]].map(([mode, label]) => (
-              <button key={mode} onClick={() => {
-                setMacroMode(mode);
-                if (mode === "calculate") {
-                  const calc = calcTDEE(body.weight, body.height, body.age, body.gender, body.activity, macros.goal);
-                  setMacros(m => ({ ...m, protein: calc.protein, carbs: calc.carbs, fat: calc.fat }));
-                }
-              }} style={{
-                flex: 1, background: macroMode === mode ? O : "#111",
-                color: macroMode === mode ? "#fff" : "#666",
-                border: `1px solid ${macroMode === mode ? O : BORDER}`,
-                borderRadius: 9, padding: "9px 8px", fontSize: 11, fontWeight: 700,
-                cursor: "pointer", transition: "all 0.18s", fontFamily: "inherit",
-              }}>{label}</button>
-            ))}
-          </div>
-
-          {/* TDEE Calculator */}
-          {macroMode === "calculate" && (
-            <div style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "16px 18px", marginBottom: 10 }}>
-              <div style={{ fontSize: 11, color: "#888", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 14 }}>Body Stats</div>
-              
-              {/* Gender */}
-              <div style={{ marginBottom: 14 }}>
-                <div style={{ fontSize: 11, color: "#aaa", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 7 }}>Gender</div>
-                <div style={{ display: "flex", gap: 6 }}>
-                  {[["male", "♂ Male"], ["female", "♀ Female"]].map(([g, label]) => (
-                    <button key={g} onClick={() => {
-                      setBody(b => ({ ...b, gender: g }));
-                      const calc = calcTDEE(body.weight, body.height, body.age, g, body.activity, macros.goal);
-                      setMacros(m => ({ ...m, protein: calc.protein, carbs: calc.carbs, fat: calc.fat }));
-                    }} style={{ flex: 1, background: body.gender === g ? "#1a1a2e" : "#111", color: body.gender === g ? "#818cf8" : "#555", border: `1px solid ${body.gender === g ? "#818cf8" : BORDER}`, borderRadius: 8, padding: "8px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s" }}>{label}</button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Weight / Height / Age sliders */}
-              {[
-                { name: "Weight", unit: "kg", val: body.weight, min: 40, max: 150, key: "weight" },
-                { name: "Height", unit: "cm", val: body.height, min: 140, max: 220, key: "height" },
-                { name: "Age", unit: "yrs", val: body.age, min: 16, max: 70, key: "age" },
-              ].map(s => (
-                <div key={s.key} style={{ marginBottom: 12 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-                    <span style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 }}>{s.name}</span>
-                    <span style={{ fontFamily: "'Space Grotesk',monospace", fontSize: 13, fontWeight: 700, color: "#fff" }}>{s.val}{s.unit}</span>
-                  </div>
-                  <input type="range" min={s.min} max={s.max} value={s.val} onChange={e => {
-                    const newBody = { ...body, [s.key]: +e.target.value };
-                    setBody(newBody);
-                    const calc = calcTDEE(newBody.weight, newBody.height, newBody.age, newBody.gender, newBody.activity, macros.goal);
-                    setMacros(m => ({ ...m, protein: calc.protein, carbs: calc.carbs, fat: calc.fat }));
-                  }} style={{ width: "100%", accentColor: "#818cf8", height: 3 }}/>
-                </div>
-              ))}
-
-              {/* Activity */}
-              <div style={{ marginBottom: 4 }}>
-                <div style={{ fontSize: 11, color: "#aaa", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 7 }}>Activity Level</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                  {[
-                    ["sedentary", "🪑 Sedentary", "Desk job, no exercise"],
-                    ["light", "🚶 Light", "1–3 days/week"],
-                    ["moderate", "🏃 Moderate", "3–5 days/week"],
-                    ["active", "💪 Active", "6–7 days/week"],
-                    ["very", "🔥 Very Active", "Twice daily"],
-                  ].map(([key, label, sub]) => (
-                    <button key={key} onClick={() => {
-                      const newBody = { ...body, activity: key };
-                      setBody(newBody);
-                      const calc = calcTDEE(newBody.weight, newBody.height, newBody.age, newBody.gender, key, macros.goal);
-                      setMacros(m => ({ ...m, protein: calc.protein, carbs: calc.carbs, fat: calc.fat }));
-                    }} style={{
-                      background: body.activity === key ? "#1a1200" : "#111",
-                      color: body.activity === key ? O : "#555",
-                      border: `1px solid ${body.activity === key ? O + "55" : BORDER}`,
-                      borderRadius: 8, padding: "8px 12px", fontSize: 11, fontWeight: 700,
-                      cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s",
-                      textAlign: "left", display: "flex", justifyContent: "space-between", alignItems: "center",
-                    }}>
-                      <span>{label}</span>
-                      <span style={{ fontSize: 10, color: body.activity === key ? O + "aa" : "#333", fontWeight: 400 }}>{sub}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Calculated result */}
-              <div style={{ marginTop: 14, background: "#111", border: `1px solid ${O}22`, borderRadius: 10, padding: "10px 14px" }}>
-                <div style={{ fontSize: 9, color: "#555", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>Calculated Macros</div>
-                <div style={{ display: "flex", gap: 12 }}>
-                  {[
-                    { l: "Protein", v: macros.protein, c: "#4ade80" },
-                    { l: "Carbs", v: macros.carbs, c: "#60a5fa" },
-                    { l: "Fat", v: macros.fat, c: O },
-                  ].map(m => (
-                    <div key={m.l} style={{ textAlign: "center", flex: 1 }}>
-                      <div style={{ fontSize: 16, fontWeight: 800, color: m.c, fontFamily: "'Space Grotesk',sans-serif" }}>{m.v}g</div>
-                      <div style={{ fontSize: 9, color: "#444", textTransform: "uppercase", letterSpacing: "0.06em" }}>{m.l}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Manual sliders */}
-          {macroMode === "manual" && (
-            <>
-            {[
-              { label: "Daily Targets", items: [
-                { name: "Protein", val: macros.protein, max: 300, color: "#4ade80", fn: setM("protein") },
-                { name: "Carbs", val: macros.carbs, max: 400, color: "#60a5fa", fn: setM("carbs") },
-                { name: "Fat", val: macros.fat, max: 150, color: O, fn: setM("fat") },
-              ]},
-            ].map(({ label, items }) => (
-              <div key={label} style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "16px 18px", marginBottom: 10 }}>
-                <div style={{ fontSize: 11, color: "#888", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 14 }}>{label}</div>
-                {items.map(s => (
-                  <div key={s.name} style={{ marginBottom: 16 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                      <span style={{ fontSize: 12, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 }}>{s.name}</span>
-                      <span style={{ fontFamily: "'Space Grotesk',monospace", fontSize: 14, fontWeight: 700, color: s.color }}>{s.val}g</span>
-                    </div>
-                    <input type="range" min={20} max={s.max} value={s.val} onChange={e => s.fn(+e.target.value)} style={{ width: "100%", accentColor: s.color, height: 3 }}/>
-                  </div>
-                ))}
-              </div>
-            ))}
-            </>
-          )}
-
-          {/* Eaten today — always shown */}
-          {[
-            { label: "Eaten Today", items: [
-              { name: "Protein", val: macros.consumed.protein, max: macros.protein, color: "#4ade80", fn: setC("protein") },
-              { name: "Carbs", val: macros.consumed.carbs, max: macros.carbs, color: "#60a5fa", fn: setC("carbs") },
-              { name: "Fat", val: macros.consumed.fat, max: macros.fat, color: O, fn: setC("fat") },
-            ]},
-          ].map(({ label, items }) => (
-            <div key={label} style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "16px 18px", marginBottom: 10 }}>
-              <div style={{ fontSize: 11, color: "#888", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700, marginBottom: 14 }}>{label}</div>
-              {items.map(s => (
-                <div key={s.name} style={{ marginBottom: 16 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                    <span style={{ fontSize: 12, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 }}>{s.name}</span>
-                    <span style={{ fontFamily: "'Space Grotesk',monospace", fontSize: 14, fontWeight: 700, color: s.color }}>{s.val}g</span>
-                  </div>
-                  <input type="range" min={20} max={s.max} value={s.val} onChange={e => s.fn(+e.target.value)} style={{ width: "100%", accentColor: s.color, height: 3 }}/>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-
-        {/* CTA button */}
-        <div style={{ padding: "16px 22px", borderTop: `1px solid ${BORDER}`, flexShrink: 0 }}>
-          <button className="sbtn" onClick={handleStart} style={{
-            width: "100%", background: O, color: "#fff", border: "none",
-            borderRadius: 14, padding: "16px", fontSize: 13, fontWeight: 800,
-            cursor: "pointer", letterSpacing: "0.02em",
-            boxShadow: `0 6px 28px ${O}44`, transition: "all 0.2s",
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-          }}>
-            {started ? "🔄 Refresh Meals" : "⚡ Find My Meals"}
-          </button>
+        <div className="panel-right">
+          <ChatPanel
+            macros={macros} agent={agent} started={started}
+            activeTab={activeTab} setActiveTab={setActiveTab}
+            isMobile={false}
+          />
         </div>
       </div>
 
-      {/* ── RIGHT: Chat panel ─────────────────────────────────────────────── */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100vh", position: "relative", zIndex: 1, overflow: "hidden" }}>
-
-        {/* Floating icons */}
-        <div style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden" }}>
-          {["🍗","🥗","🥚","💪","⚡","🥣","🫘","🧀"].map((ic, i) => (
-            <div key={i} style={{ position: "absolute", left: `${8+i*12}%`, bottom: -20, fontSize: 14+(i%3)*6, opacity: 0, animation: `floatIcon ${7+i*0.8}s ease-in-out ${i*0.9}s infinite`, userSelect: "none" }}>{ic}</div>
-          ))}
-        </div>
-
-        {/* Tab bar */}
-        <div style={{ display: "flex", borderBottom: `1px solid ${BORDER}`, flexShrink: 0, background: "#080808", padding: "0 4px" }}>
-          {[
-            { id: "chat", label: "💬 Chat" },
-            { id: "week", label: "📅 Week Plan" },
-            { id: "budget", label: "💰 Budget" },
-            { id: "coach", label: "👤 Coach" },
-          ].map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
-              background: "none", border: "none",
-              borderBottom: activeTab === tab.id ? `2px solid ${O}` : "2px solid transparent",
-              color: activeTab === tab.id ? "#fff" : "#444",
-              padding: "12px 16px", fontSize: 12, fontWeight: 700,
-              cursor: "pointer", fontFamily: "inherit", transition: "color 0.15s",
-              marginBottom: -1,
-            }}>{tab.label}</button>
-          ))}
-          {agent.toolActivity && (
-            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 5, padding: "0 16px" }}>
-              <div style={{ width: 4, height: 4, borderRadius: "50%", background: O, animation: "demoPulse 0.8s infinite" }}/>
-              <span style={{ fontSize: 9, color: "#444", fontFamily: "'Space Grotesk',monospace" }}>{agent.toolActivity}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Tab content */}
-        {activeTab === "chat" && (
-          <>
-            <div style={{ flex: 1, overflowY: "auto", padding: "14px 20px", position: "relative", zIndex: 1 }}>
-              {!started ? (
-                <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, opacity: 0.3 }}>
-                  <div style={{ fontSize: 52 }}>🍽</div>
-                  <div style={{ fontSize: 12, color: "#333", textAlign: "center", fontFamily: "'Space Grotesk',sans-serif", lineHeight: 1.6 }}>Configure your macros<br/>and hit Find My Meals →</div>
-                </div>
-              ) : (
-                agent.messages.map((m, i) => (
-                  <div key={i} style={{ animation: "fadeIn 0.3s ease-out" }}>
-                    <Bubble msg={m} onAdd={name => send(`Add ${name} to my cart`)}/>
-                  </div>
-                ))
-              )}
-              {agent.loading && <TypingDots/>}
-              <div ref={chatEnd}/>
-            </div>
-            {started && agent.messages.length <= 2 && !agent.loading && (
-              <div style={{ padding: "0 20px 8px", display: "flex", gap: 5, flexWrap: "wrap", flexShrink: 0 }}>
-                {QUICK_PROMPTS.map(q => (
-                  <button key={q.text} className="qp" onClick={() => send(q.text)} style={{ background: "#0d0d0d", border: `1px solid ${BORDER}`, borderRadius: 99, padding: "5px 11px", fontSize: 10, color: "#777", cursor: "pointer", transition: "all 0.15s", fontFamily: "inherit" }}>{q.label}</button>
-                ))}
-              </div>
-            )}
-            <div style={{ padding: "11px 20px", borderTop: `1px solid ${BORDER}`, display: "flex", gap: 8, flexShrink: 0, background: "#080808" }}>
-              <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()}
-                placeholder={started ? "Ask about meals, macros, or 'add to cart'…" : "Set your macros first →"}
-                disabled={!started}
-                style={{ flex: 1, background: "#111", border: `1px solid ${BORDER}`, borderRadius: 11, padding: "10px 15px", color: "#fff", fontSize: 13, opacity: started ? 1 : 0.4 }}/>
-              <button onClick={() => send()} disabled={agent.loading || !input.trim() || !started} style={{
-                width: 42, height: 42, flexShrink: 0,
-                background: !agent.loading && input.trim() && started ? O : "#111",
-                border: `1px solid ${!agent.loading && input.trim() && started ? O : BORDER}`,
-                borderRadius: 10, fontSize: 17, cursor: "pointer",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                transition: "all 0.2s",
-                boxShadow: !agent.loading && input.trim() && started ? `0 4px 16px ${O}44` : "none",
-              }}>→</button>
-            </div>
-          </>
-        )}
-        {activeTab === "week" && (
-          <div style={{ flex: 1, overflow: "hidden" }}>
-            <WeekPlan macros={macros} />
-          </div>
-        )}
-        {activeTab === "budget" && (
-          <div style={{ flex: 1, overflow: "hidden" }}>
-            <Budget macros={macros} />
-          </div>
-        )}
-        {activeTab === "coach" && (
-          <div style={{ flex: 1, overflow: "hidden" }}>
-            <Coach macros={macros} onApplyTargets={(targets) => {
-              setMacros(m => ({ ...m, protein: targets.protein, carbs: targets.carbs, fat: targets.fat, goal: targets.goal }));
-              setActiveTab("chat");
-            }} />
-          </div>
-        )}
+      {/* Mobile bottom nav */}
+      <div className="mobile-bottom-nav">
+        <button className={mobileView === "setup" ? "active" : ""} onClick={() => setMobileView("setup")}>
+          <span>⚙</span>
+          <span>Setup</span>
+        </button>
+        <button className={mobileView === "chat" && activeTab === "chat" ? "active" : ""} onClick={() => { setMobileView("chat"); setActiveTab("chat"); }}>
+          <span>💬</span>
+          <span>Chat</span>
+        </button>
+        <button className={mobileView === "chat" && activeTab === "week" ? "active" : ""} onClick={() => { setMobileView("chat"); setActiveTab("week"); }}>
+          <span>📅</span>
+          <span>Plan</span>
+        </button>
+        <button className={mobileView === "chat" && activeTab === "budget" ? "active" : ""} onClick={() => { setMobileView("chat"); setActiveTab("budget"); }}>
+          <span>💰</span>
+          <span>Budget</span>
+        </button>
+        <button className={mobileView === "chat" && activeTab === "coach" ? "active" : ""} onClick={() => { setMobileView("chat"); setActiveTab("coach"); }}>
+          <span>👤</span>
+          <span>Coach</span>
+        </button>
       </div>
     </div>
   );
