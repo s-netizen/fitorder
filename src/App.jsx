@@ -1,5 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useAgent } from "./hooks/useAgent.js";
+import WeekPlan from "./components/WeekPlan.jsx";
+import Budget from "./components/Budget.jsx";
+import Coach from "./components/Coach.jsx";
 
 const O = "#FC8019";
 const BG = "#080808";
@@ -223,6 +226,7 @@ export default function App() {
   const [macroMode, setMacroMode] = useState("manual"); // "manual" | "calculate"
   const [body, setBody] = useState({ weight: 75, height: 175, age: 28, gender: "male", activity: "moderate" });
   const [started, setStarted] = useState(false);
+  const [activeTab, setActiveTab] = useState("chat");
   const [input, setInput] = useState("");
   const agent = useAgent(macros);
   const chatEnd = useRef(null);
