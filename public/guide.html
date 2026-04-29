@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FitOrder — Product Guide · Swiggy Builders Club</title>
+<meta name="description" content="FitOrder is a fitness-aware meal ordering agent built on Swiggy Builders Club MCP. Product guide, architecture, and roadmap."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --orange: #FC8019;
+    --orange-light: #fff3e8;
+    --orange-dim: rgba(252,128,25,0.12);
+    --bg: #0a0a0a;
+    --bg2: #111111;
+    --bg3: #161616;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #f0f0f0;
+    --text2: #888;
+    --text3: #555;
+    --green: #4ade80;
+    --blue: #60a5fa;
+    --purple: #c084fc;
+    --green-bg: rgba(74,222,128,0.08);
+    --blue-bg: rgba(96,165,250,0.08);
+    --purple-bg: rgba(192,132,252,0.08);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* Nav */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800;
+    letter-spacing: -0.02em; color: var(--text); text-decoration: none;
+  }
+  .nav-logo-icon {
+    width: 30px; height: 30px; background: var(--orange); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; font-size: 15px;
+  }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a {
+    font-size: 13px; color: var(--text2); text-decoration: none; font-weight: 500;
+    transition: color 0.15s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    background: var(--orange); color: #fff; border: none;
+    border-radius: 8px; padding: 7px 16px; font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit; text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .nav-cta:hover { opacity: 0.88; }
+
+  /* Layout */
+  .container { max-width: 860px; margin: 0 auto; padding: 0 32px; }
+
+  /* Hero */
+  .hero {
+    padding: 120px 0 80px;
+    border-bottom: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -200px; right: -200px;
+    width: 600px; height: 600px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(252,128,25,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    border-radius: 99px; padding: 4px 12px; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.05em; text-transform: uppercase; border: 1px solid;
+  }
+  .badge-orange { background: rgba(252,128,25,0.1); color: var(--orange); border-color: rgba(252,128,25,0.25); }
+  .badge-green { background: var(--green-bg); color: var(--green); border-color: rgba(74,222,128,0.25); }
+  .badge-blue { background: var(--blue-bg); color: var(--blue); border-color: rgba(96,165,250,0.25); }
+  .badge-purple { background: var(--purple-bg); color: var(--purple); border-color: rgba(192,132,252,0.25); }
+  .badge-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif; font-size: 52px; font-weight: 800;
+    letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 20px;
+  }
+  .hero h1 span { color: var(--orange); }
+  .hero-sub {
+    font-size: 17px; color: var(--text2); max-width: 560px;
+    line-height: 1.7; margin-bottom: 32px;
+  }
+  .hero-links { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--orange); color: #fff; border: none;
+    border-radius: 10px; padding: 12px 24px; font-size: 14px; font-weight: 600;
+    cursor: pointer; font-family: inherit; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.2s;
+    box-shadow: 0 8px 24px rgba(252,128,25,0.35);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 12px 32px rgba(252,128,25,0.45); }
+  .btn-secondary {
+    background: var(--bg3); color: var(--text2); border: 1px solid var(--border2);
+    border-radius: 10px; padding: 12px 24px; font-size: 14px; font-weight: 600;
+    cursor: pointer; font-family: inherit; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover { color: var(--text); border-color: var(--border2); }
+
+  /* Sections */
+  section { padding: 72px 0; border-bottom: 1px solid var(--border); }
+  section:last-child { border-bottom: none; }
+  .section-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800;
+    letter-spacing: -0.03em; margin-bottom: 14px; line-height: 1.2;
+  }
+  .section-sub { font-size: 15px; color: var(--text2); max-width: 560px; line-height: 1.7; margin-bottom: 40px; }
+
+  /* Stats row */
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 48px; }
+  .stat-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 14px;
+    padding: 20px; text-align: center;
+  }
+  .stat-val { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: var(--orange); margin-bottom: 4px; }
+  .stat-label { font-size: 12px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* Feature grid */
+  .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .feature-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 14px;
+    padding: 22px; transition: border-color 0.2s;
+  }
+  .feature-card:hover { border-color: var(--border2); }
+  .feature-icon { font-size: 24px; margin-bottom: 12px; }
+  .feature-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+  .feature-desc { font-size: 13px; color: var(--text2); line-height: 1.65; }
+
+  /* Architecture */
+  .arch-flow { display: flex; flex-direction: column; align-items: center; gap: 0; max-width: 520px; margin: 0 auto; }
+  .arch-node {
+    width: 100%; border-radius: 12px; padding: 14px 20px; text-align: center;
+    border: 1px solid; font-size: 14px; font-weight: 600; line-height: 1.4;
+  }
+  .arch-node-sub { font-size: 11px; font-weight: 400; opacity: 0.65; margin-top: 3px; }
+  .arch-node-react { background: var(--blue-bg); border-color: rgba(96,165,250,0.3); color: var(--blue); }
+  .arch-node-fn { background: rgba(252,128,25,0.1); border-color: rgba(252,128,25,0.3); color: var(--orange); }
+  .arch-node-claude { background: var(--purple-bg); border-color: rgba(192,132,252,0.3); color: var(--purple); }
+  .arch-arrow-down { font-size: 20px; color: var(--text3); padding: 6px 0; }
+  .arch-split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+  .arch-node-food { background: rgba(252,128,25,0.08); border-color: rgba(252,128,25,0.25); color: var(--orange); }
+  .arch-node-insta { background: var(--green-bg); border-color: rgba(74,222,128,0.25); color: var(--green); }
+  .arch-tools { font-size: 11px; font-weight: 400; color: inherit; opacity: 0.6; margin-top: 6px; line-height: 1.6; }
+
+  /* Roadmap */
+  .roadmap { display: flex; flex-direction: column; gap: 0; }
+  .roadmap-item {
+    display: flex; gap: 20px; align-items: flex-start;
+    padding: 24px 0; border-bottom: 1px solid var(--border);
+  }
+  .roadmap-item:last-child { border-bottom: none; }
+  .roadmap-badge {
+    flex-shrink: 0; border-radius: 99px; padding: 5px 14px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    border: 1px solid; min-width: 72px; text-align: center; margin-top: 2px;
+  }
+  .roadmap-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 5px; }
+  .roadmap-desc { font-size: 13px; color: var(--text2); line-height: 1.65; }
+
+  /* Ask */
+  .ask-box {
+    background: linear-gradient(135deg, rgba(252,128,25,0.08), rgba(252,128,25,0.03));
+    border: 1px solid rgba(252,128,25,0.25); border-radius: 20px; padding: 40px;
+    text-align: center;
+  }
+  .ask-title { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 12px; }
+  .ask-sub { font-size: 15px; color: var(--text2); margin-bottom: 28px; max-width: 480px; margin-left: auto; margin-right: auto; }
+  .ask-steps { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 32px; }
+  .ask-step {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 18px; font-size: 13px; font-weight: 500; color: var(--text2);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .ask-step-num {
+    width: 22px; height: 22px; border-radius: 6px;
+    background: rgba(252,128,25,0.15); color: var(--orange);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; flex-shrink: 0;
+  }
+
+  /* Builder */
+  .builder-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 16px;
+    padding: 28px; display: flex; gap: 24px; align-items: flex-start;
+  }
+  .builder-avatar {
+    width: 52px; height: 52px; border-radius: 14px; background: var(--orange);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: #fff;
+    flex-shrink: 0;
+  }
+  .builder-name { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .builder-title { font-size: 13px; color: var(--text2); margin-bottom: 12px; }
+  .builder-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .builder-link {
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
+    padding: 5px 12px; font-size: 12px; font-weight: 500; color: var(--text2);
+    text-decoration: none; transition: all 0.15s;
+  }
+  .builder-link:hover { color: var(--text); border-color: var(--border2); }
+
+  /* MCP pills */
+  .mcp-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .mcp-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 99px; padding: 5px 13px; font-size: 12px; font-weight: 500; color: var(--text2);
+  }
+  .mcp-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border); padding: 32px 0;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; color: var(--text3);
+  }
+
+  /* Animations */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes glow { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
+  .animate { animation: fadeUp 0.6s ease-out both; }
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.2s; }
+  .delay-3 { animation-delay: 0.3s; }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 36px; }
+    .feature-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: 1fr; }
+    .arch-split { grid-template-columns: 1fr; }
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    .container { padding: 0 20px; }
+    .builder-card { flex-direction: column; }
+    footer { flex-direction: column; gap: 8px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-icon">⚡</div>
+    Fit<span style="color:var(--orange)">Order</span>
+  </a>
+  <div class="nav-links">
+    <a href="#problem">Problem</a>
+    <a href="#features">Features</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#roadmap">Roadmap</a>
+    <a href="#ask">The Ask</a>
+  </div>
+  <a class="nav-cta" href="https://gleaming-truffle-45db78.netlify.app" target="_blank">Try Live Demo →</a>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="container">
+    <div class="hero-badges animate">
+      <span class="badge badge-orange"><span class="badge-dot"></span>Demo Live</span>
+      <span class="badge badge-green">Swiggy Food MCP</span>
+      <span class="badge badge-green">Instamart MCP</span>
+      <span class="badge badge-blue">Claude API</span>
+      <span class="badge badge-purple">Builders Club</span>
+    </div>
+    <h1 class="animate delay-1">The meal agent that<br/>knows your <span>macros</span></h1>
+    <p class="hero-sub animate delay-2">FitOrder is a fitness-aware meal ordering agent built on Swiggy's MCP platform. Tell it your goal — it finds the right meal, not just the nearest restaurant.</p>
+    <div class="hero-links animate delay-3">
+      <a class="btn-primary" href="https://gleaming-truffle-45db78.netlify.app" target="_blank">⚡ Try Live Demo</a>
+      <a class="btn-secondary" href="https://github.com/s-netizen/fitorder" target="_blank">GitHub →</a>
+    </div>
+  </div>
+</div>
+
+<!-- Problem -->
+<section id="problem">
+  <div class="container">
+    <div class="section-label">The Problem</div>
+    <h2 class="section-title">6 PM. What can I eat?</h2>
+    <p class="section-sub">People tracking fitness goals spend significant mental energy every meal cross-referencing apps, doing math on what they've eaten, and hunting through Swiggy menus hoping something fits. No delivery product today understands <em>why</em> you're eating — not just what you want to order.</p>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-val">3+</div>
+        <div class="stat-label">Apps used per meal</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">40kg</div>
+        <div class="stat-label">Builder's own transformation</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">Daily</div>
+        <div class="stat-label">Friction at every meal</div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--orange);border-radius:0 14px 14px 0;padding:20px 24px;">
+      <p style="font-size:15px;color:var(--text2);margin:0;line-height:1.75;">"I lost 40kg over two years. The hardest part wasn't the gym. It was the 6 PM question every day — what can I eat that actually fits my macros? That friction is what I built against."</p>
+      <p style="font-size:13px;color:var(--text3);margin-top:10px;margin-bottom:0;">— Sanchit, Builder</p>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section id="features">
+  <div class="container">
+    <div class="section-label">What it does</div>
+    <h2 class="section-title">Six features. One agent.</h2>
+    <p class="section-sub">Everything built around a single loop — remaining macros in, right meal out.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <div class="feature-title">Macro-aware meal ranking</div>
+        <div class="feature-desc">Every meal scored by how well it fills your remaining protein, carb, and fat gap — not just keyword search. Meals are ranked, not listed.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📐</div>
+        <div class="feature-title">TDEE calculator</div>
+        <div class="feature-desc">Enter height, weight, age, and activity level. Mifflin-St Jeor BMR × multiplier → goal-adjusted macro targets set automatically. No spreadsheet needed.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📅</div>
+        <div class="feature-title">7-day meal planner</div>
+        <div class="feature-desc">Full week of Swiggy orders planned around your macro targets. Shows weekly cost, avg protein per day, and per-day macro breakdown.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💰</div>
+        <div class="feature-title">Budget tracker</div>
+        <div class="feature-desc">Protein-per-rupee efficiency score from your Swiggy order history. Best and worst value meals. Spend by restaurant. Macro compliance over time.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👤</div>
+        <div class="feature-title">Coach mode</div>
+        <div class="feature-desc">Coach sets macro targets, shares a link. Client opens it with pre-loaded targets. They order within the plan. Coach sees compliance. No extra app needed.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <div class="feature-title">Conversational agent</div>
+        <div class="feature-desc">Ask about swaps, veg-only options, budget constraints, or reorder a past meal. Full natural language reasoning powered by Claude API.</div>
+      </div>
+    </div>
+
+    <div class="mcp-row">
+      <div class="mcp-pill"><span class="mcp-dot" style="background:var(--orange)"></span>search_restaurants()</div>
+      <div class="mcp-pill"><span class="mcp-dot" style="background:var(--orange)"></span>get_restaurant_menu()</div>
+      <div class="mcp-pill"><span class="mcp-dot" style="background:var(--orange)"></span>update_food_cart()</div>
+      <div class="mcp-pill"><span class="mcp-dot" style="background:var(--orange)"></span>place_food_order()</div>
+      <div class="mcp-pill"><span class="mcp-dot" style="background:var(--green)"></span>search_products()</div>
+      <div class="mcp-pill"><span class="mcp-dot" style="background:var(--green)"></span>get_orders()</div>
+      <div class="mcp-pill"><span class="mcp-dot" style="background:var(--green)"></span>checkout()</div>
+    </div>
+  </div>
+</section>
+
+<!-- Architecture -->
+<section id="architecture">
+  <div class="container">
+    <div class="section-label">Architecture</div>
+    <h2 class="section-title">How it's built</h2>
+    <p class="section-sub">API key server-side only. React PWA on the frontend. Claude API as the reasoning layer. Swiggy MCP for real data and actions.</p>
+
+    <div class="arch-flow">
+      <div class="arch-node arch-node-react">
+        React PWA · Netlify CDN
+        <div class="arch-node-sub">Static frontend — zero server cost at scale</div>
+      </div>
+      <div class="arch-arrow-down">↓</div>
+      <div class="arch-node arch-node-fn">
+        Netlify Function · Secure API Proxy
+        <div class="arch-node-sub">ANTHROPIC_API_KEY never exposed to browser</div>
+      </div>
+      <div class="arch-arrow-down">↓</div>
+      <div class="arch-node arch-node-claude">
+        Claude API · claude-haiku-4 Reasoning Layer
+        <div class="arch-node-sub">Understands macro gaps · Calls MCP tools · Ranks results</div>
+      </div>
+      <div class="arch-arrow-down">↓</div>
+      <div class="arch-split">
+        <div class="arch-node arch-node-food">
+          Swiggy Food MCP
+          <div class="arch-tools">search_restaurants<br/>get_restaurant_menu<br/>update_food_cart<br/>place_food_order<br/>track_food_order</div>
+        </div>
+        <div class="arch-node arch-node-insta">
+          Instamart MCP
+          <div class="arch-tools">search_products<br/>update_cart<br/>checkout<br/>get_orders<br/>track_order</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:32px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--green);margin-bottom:4px">~₹0.50</div>
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em">Cost per session</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--blue);margin-bottom:4px">125K</div>
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em">Monthly fn calls (free)</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--orange);margin-bottom:4px">3 MCP</div>
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em">Servers integrated</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Roadmap -->
+<section id="roadmap">
+  <div class="container">
+    <div class="section-label">Roadmap</div>
+    <h2 class="section-title">Where this goes</h2>
+    <p class="section-sub">Demo mode is live and working. One OAuth Client ID flips this to fully live Swiggy data.</p>
+
+    <div class="roadmap">
+      <div class="roadmap-item">
+        <div class="roadmap-badge badge-green" style="background:var(--green-bg);border-color:rgba(74,222,128,0.3);color:var(--green)">Live</div>
+        <div>
+          <div class="roadmap-title">Core agent — fully working</div>
+          <div class="roadmap-desc">Macro-aware ranking · TDEE calculator · 7-day meal planner · Budget tracker · Coach mode · Conversational agent · Netlify deployed</div>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-badge badge-orange" style="background:rgba(252,128,25,0.1);border-color:rgba(252,128,25,0.3);color:var(--orange)">Next</div>
+        <div>
+          <div class="roadmap-title">Swiggy OAuth → fully live data</div>
+          <div class="roadmap-desc">Real restaurants near user · Real menus and pricing · Live cart and ordering · Per-user rate limiting · Reorder past macro-matching meals</div>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-badge badge-blue" style="background:var(--blue-bg);border-color:rgba(96,165,250,0.3);color:var(--blue)">v1.1</div>
+        <div>
+          <div class="roadmap-title">Wearable sync</div>
+          <div class="roadmap-desc">Apple Health and Google Fit integration — auto-calculate remaining macros without manual daily logging. Activity data informs calorie targets in real time.</div>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-badge badge-purple" style="background:var(--purple-bg);border-color:rgba(192,132,252,0.3);color:var(--purple)">v2.0</div>
+        <div>
+          <div class="roadmap-title">Dineout + Coach dashboard</div>
+          <div class="roadmap-desc">Macro-aware restaurant booking for dine-in via Dineout MCP. Coach compliance dashboard with multi-client view, weekly reports, and approved restaurant lists.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- The Ask -->
+<section id="ask">
+  <div class="container">
+    <div class="ask-box">
+      <div class="section-label" style="margin-bottom:16px">The Ask</div>
+      <div class="ask-title">One OAuth Client ID</div>
+      <p class="ask-sub">The architecture is ready. The agent works. The UI is live. All that's needed to flip from demo to fully live Swiggy data is OAuth credentials from the Builders Club team.</p>
+
+      <div class="ask-steps">
+        <div class="ask-step"><div class="ask-step-num">1</div>OAuth Client ID issued</div>
+        <div class="ask-step"><div class="ask-step-num">2</div>Redirect URI whitelisted</div>
+        <div class="ask-step"><div class="ask-step-num">3</div>Real restaurants load</div>
+        <div class="ask-step"><div class="ask-step-num">4</div>Live cart and ordering</div>
+      </div>
+
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a class="btn-primary" href="https://gleaming-truffle-45db78.netlify.app" target="_blank">⚡ Try Demo Now</a>
+        <a class="btn-secondary" href="mailto:builders@swiggy.in">builders@swiggy.in →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Builder -->
+<section>
+  <div class="container">
+    <div class="section-label">The Builder</div>
+    <h2 class="section-title">Built by a PM, not a developer</h2>
+    <p class="section-sub">This is what product management looks like when you build what you actually need.</p>
+
+    <div class="builder-card">
+      <div class="builder-avatar">S</div>
+      <div>
+        <div class="builder-name">Sanchit</div>
+        <div class="builder-title">Program Manager · Akamai Technologies · PMP® CSM® · BITSoM AI Product Management</div>
+        <div class="builder-links">
+          <a class="builder-link" href="https://gleaming-truffle-45db78.netlify.app" target="_blank">⚡ Live Demo</a>
+          <a class="builder-link" href="https://github.com/s-netizen/fitorder" target="_blank">GitHub</a>
+          <a class="builder-link" href="mailto:builders@swiggy.in">builders@swiggy.in</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<div class="container">
+  <footer>
+    <div>Built for <strong>Swiggy Builders Club</strong> · Powered by Swiggy MCP × Claude API</div>
+    <div>© 2026 FitOrder</div>
+  </footer>
+</div>
+
+</body>
+</html>
