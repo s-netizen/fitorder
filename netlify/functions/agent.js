@@ -1,54 +1,68 @@
 // netlify/functions/agent.js
-// Secure proxy — API key never exposed to browser
+// Secure proxy — Anthropic API key never exposed to browser
+
+const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Content-Type": "application/json",
+};
 
 export const handler = async (event) => {
-  // Only allow POST
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: JSON.stringify({ error: "Method not allowed" }) };
-  }
-
-  const CORS = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Content-Type": "application/json",
-  };
-
-  // Handle preflight
   if (event.httpMethod === "OPTIONS") {
     return { statusCode: 200, headers: CORS, body: "" };
   }
 
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, headers: CORS, body: JSON.stringify({ error: "Method not allowed" }) };
+  }
+
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.error("ANTHROPIC_API_KEY not set");
+    return {
+      statusCode: 500,
+      headers: CORS,
+      body: JSON.stringify({ error: "Server config error: API key not set. Add ANTHROPIC_API_KEY to Netlify environment variables." }),
+    };
+  }
+
+  let messages, macroContext;
   try {
-    const { messages, macroContext } = JSON.parse(event.body);
+    const body = JSON.parse(event.body);
+    messages = body.messages;
+    macroContext = body.macroContext;
+  } catch (e) {
+    return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: "Invalid JSON body" }) };
+  }
 
-    if (!messages || !macroContext) {
-      return {
-        statusCode: 400,
-        headers: CORS,
-        body: JSON.stringify({ error: "Missing messages or macroContext" }),
-      };
-    }
+  if (!messages || !macroContext) {
+    return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: "Missing messages or macroContext" }) };
+  }
 
-    const systemPrompt = `You are FitOrder — a fitness-aware meal ordering agent running live on Swiggy's MCP platform.
+  const remaining = {
+    protein: macroContext.protein - macroContext.consumed.protein,
+    carbs: macroContext.carbs - macroContext.consumed.carbs,
+    fat: macroContext.fat - macroContext.consumed.fat,
+  };
 
-User's fitness profile:
+  const systemPrompt = `You are FitOrder — a fitness-aware meal ordering agent on Swiggy's live MCP platform.
+
+User fitness profile:
 - Goal: ${macroContext.goal}
 - Daily targets: ${macroContext.protein}g protein / ${macroContext.carbs}g carbs / ${macroContext.fat}g fat
-- Already consumed today: ${macroContext.consumed.protein}g P / ${macroContext.consumed.carbs}g C / ${macroContext.consumed.fat}g F
-- Remaining needed: ${macroContext.protein - macroContext.consumed.protein}g P / ${macroContext.carbs - macroContext.consumed.carbs}g C / ${macroContext.fat - macroContext.consumed.fat}g F
+- Consumed today: ${macroContext.consumed.protein}g P / ${macroContext.consumed.carbs}g C / ${macroContext.consumed.fat}g F
+- Still needed: ${remaining.protein}g protein / ${remaining.carbs}g carbs / ${remaining.fat}g fat
 
-Your workflow:
-1. Call get_addresses first to get the user's saved delivery location
-2. Search for meals using search_restaurants or search_menu with protein-forward queries
-3. Score options against remaining macros — prioritize protein gap first, then calories
-4. Recommend top 2-3 options with estimated macros and price
-5. If user says "add to cart" or "order this" — call update_food_cart directly
-6. For grocery/supplement needs — use Instamart search_products
-7. For past orders — use get_food_orders to show history or suggest reorders
+Workflow:
+1. Call get_addresses to get user's real addressId — never guess it
+2. Search restaurants/menu for high-protein options near user
+3. Recommend top 2-3 meals scored against remaining macros — lead with protein
+4. On "add to cart" — call update_food_cart directly
+5. For supplements/groceries — use Instamart search_products
+6. For history — call get_food_orders
 
-Tone: Direct, coach-like, specific. Always reference actual macro numbers.
-Format: Use clear sections when showing multiple meal options. Include protein content prominently.`;
+Tone: Direct, coach-like. Always cite macro numbers. No fluff.`;
 
+  try {
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -70,21 +84,20 @@ Format: Use clear sections when showing multiple meal options. Include protein c
       }),
     });
 
+    const responseText = await response.text();
+
     if (!response.ok) {
-      const err = await response.text();
-      console.error("Anthropic API error:", err);
+      console.error("Anthropic API error:", response.status, responseText);
       return {
         statusCode: response.status,
         headers: CORS,
-        body: JSON.stringify({ error: "Agent error", detail: err }),
+        body: JSON.stringify({ error: `Anthropic API error ${response.status}`, detail: responseText }),
       };
     }
 
-    const data = await response.json();
-
-    // Extract text and tool activity from content blocks
+    const data = JSON.parse(responseText);
     let replyText = "";
-    let toolsCalled = [];
+    const toolsCalled = [];
 
     for (const block of data.content || []) {
       if (block.type === "text") replyText += block.text;
@@ -97,18 +110,17 @@ Format: Use clear sections when showing multiple meal options. Include protein c
       statusCode: 200,
       headers: CORS,
       body: JSON.stringify({
-        reply: replyText,
+        reply: replyText || "Searching Swiggy for your macro matches...",
         toolsCalled,
         stopReason: data.stop_reason,
-        rawContent: data.content,
       }),
     };
 
   } catch (err) {
-    console.error("Function error:", err);
+    console.error("Function error:", err.message);
     return {
       statusCode: 500,
-      headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" },
+      headers: CORS,
       body: JSON.stringify({ error: "Internal error", detail: err.message }),
     };
   }
