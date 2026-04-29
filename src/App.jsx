@@ -1,23 +1,26 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import MacroSetup from "./components/MacroSetup.jsx";
 import Chat from "./components/Chat.jsx";
 import { useAgent } from "./hooks/useAgent.js";
 
 export default function App() {
   const [view, setView] = useState("setup");
-  const [macros, setMacros] = useState(null);
-  const agent = useAgent(macros || {});
+  const [macros, setMacros] = useState({
+    goal: "recomp", protein: 160, carbs: 180, fat: 60,
+    consumed: { protein: 85, carbs: 90, fat: 32 }
+  });
+  const agent = useAgent(macros);
 
+  // Pass macros AND opening message together so agent always has valid macros
   function handleStart(selectedMacros, openingMessage) {
     setMacros(selectedMacros);
     setView("chat");
-    setTimeout(() => agent.startSession(openingMessage), 100);
+    agent.startSession(openingMessage, selectedMacros);
   }
 
   function handleReset() {
     agent.reset();
     setView("setup");
-    setMacros(null);
   }
 
   if (view === "setup") return <MacroSetup onStart={handleStart} />;
