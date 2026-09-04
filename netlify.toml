@@ -1,0 +1,29 @@
+[build]
+  command = "npm run build"
+    publish = "dist"
+      base = "/"
+        functions = "netlify/functions"
+
+        [dev]
+          command = "npm run dev"
+            port = 5173
+              functions_port = 8888
+
+              # Swiggy's whitelisted redirect URI is a nested path (/api/auth/callback/swiggy),
+              # which the generic /api/* -> :splat rule below can't route to a flat function
+              # name. This specific rule must stay above that wildcard so it matches first.
+              [[redirects]]
+                from = "/api/auth/callback/swiggy"
+                  to = "/.netlify/functions/auth-callback"
+                    status = 200
+
+                    [[redirects]]
+                      from = "/api/*"
+                        to = "/.netlify/functions/:splat"
+                          status = 200
+
+                          [[redirects]]
+                            from = "/*"
+                              to = "/index.html"
+                                status = 200
+                                
