@@ -106,10 +106,17 @@ exports.handler = async (event) => {
     const maxAgeSeconds = 5 * 24 * 60 * 60;
     const tokenCookiePayload = sign(accessToken, cookieSecret);
 
+    // Netlify's Lambda-compatibility response format doesn't accept arrays
+    // in "headers" — a "Set-Cookie" array there throws
+    // "invalid type []interface {} for headers key Set-Cookie" at the proxy
+    // layer. Multiple Set-Cookie values must go in "multiValueHeaders"
+    // instead; single-value headers like Location stay in "headers".
     return {
           statusCode: 302,
           headers: {
                   Location: `${appUrl}?swiggy_auth=success`,
+          },
+          multiValueHeaders: {
                   "Set-Cookie": [
                             `swiggy_token=${encodeURIComponent(tokenCookiePayload)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAgeSeconds}`,
                             // Clear the now-used PKCE cookie.
