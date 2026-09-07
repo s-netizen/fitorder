@@ -9,6 +9,7 @@
 // this flow via auth-start.
 
 const { verifySigned, sign } = require("../lib/pkce");
+const { getSwiggyClientId } = require("../lib/dcr");
 
 const METADATA_URL = "https://mcp.swiggy.com/.well-known/oauth-authorization-server";
 
@@ -24,9 +25,20 @@ function parseCookies(header) {
 
 exports.handler = async (event) => {
     const cookieSecret = process.env.OAUTH_COOKIE_SECRET;
-    const clientId = process.env.SWIGGY_CLIENT_ID;
     const redirectUri = process.env.SWIGGY_REDIRECT_URI;
     const appUrl = process.env.APP_URL || "/"; // where to send the user after linking
+
+    if (!cookieSecret || !redirectUri) {
+          return { statusCode: 500, body: "Missing OAUTH_COOKIE_SECRET or SWIGGY_REDIRECT_URI env vars." };
+    }
+
+    let clientId;
+    try {
+          clientId = await getSwiggyClientId(redirectUri);
+    } catch (e) {
+          console.error("Swiggy client registration failed:", e.message);
+          return { statusCode: 302, headers: { Location: `${appUrl}?swiggy_auth=failed` }, body: "" };
+    }
 
     const { code, state: returnedState, error } = event.queryStringParameters || {};
 
