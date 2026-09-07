@@ -22,7 +22,7 @@ exports.handler = async (event) => {
 
     let clientId;
     try {
-          clientId = await getSwiggyClientId(redirectUri);
+          clientId = await getSwiggyClientId(redirectUri, event);
     } catch (e) {
           console.error("Swiggy client registration failed:", e.message);
           return { statusCode: 502, body: "Could not register with Swiggy MCP — try again shortly." };
