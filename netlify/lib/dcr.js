@@ -8,7 +8,7 @@
 // registration is skipped entirely — handy if you ever want to pin a
 // known-good client_id instead of relying on the cache.
 
-const { getStore } = require("@netlify/blobs");
+const { connectLambda, getStore } = require("@netlify/blobs");
 
 const REGISTER_URL = "https://mcp.swiggy.com/auth/register";
 const BLOB_STORE = "swiggy-oauth";
@@ -42,11 +42,17 @@ async function registerClient(redirectUri) {
 // Returns a usable client_id, registering with Swiggy if we don't already
 // have one cached. Safe to call on every request — cheap cache hit after
 // the first successful registration.
-async function getSwiggyClientId(redirectUri) {
+//
+// event is the Lambda event passed into the function handler. These
+// functions run in Netlify's Lambda-compatibility mode, where the Blobs
+// environment isn't auto-configured — connectLambda(event) wires it up
+// from the incoming request before getStore() will work.
+async function getSwiggyClientId(redirectUri, event) {
     if (process.env.SWIGGY_CLIENT_ID) {
           return process.env.SWIGGY_CLIENT_ID;
     }
 
+    connectLambda(event);
     const store = getStore(BLOB_STORE);
     const cached = await store.get(BLOB_KEY);
     if (cached) {
