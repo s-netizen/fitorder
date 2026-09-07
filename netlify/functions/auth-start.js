@@ -5,19 +5,27 @@
 // may move as dynamic client registration support matures across vendors.
 
 const { generateCodeVerifier, codeChallengeFromVerifier, generateState, sign } = require("../lib/pkce");
+const { getSwiggyClientId } = require("../lib/dcr");
 
 const METADATA_URL = "https://mcp.swiggy.com/.well-known/oauth-authorization-server";
 
 exports.handler = async (event) => {
     const cookieSecret = process.env.OAUTH_COOKIE_SECRET;
-    const clientId = process.env.SWIGGY_CLIENT_ID;
-    const redirectUri = process.env.SWIGGY_REDIRECT_URI; // e.g. https://fitorder.netlify.app/api/auth-callback
+    const redirectUri = process.env.SWIGGY_REDIRECT_URI; // https://fitorder.netlify.app/api/auth/callback/swiggy
 
-    if (!cookieSecret || !clientId || !redirectUri) {
+    if (!cookieSecret || !redirectUri) {
           return {
                   statusCode: 500,
-                  body: "Missing OAUTH_COOKIE_SECRET, SWIGGY_CLIENT_ID, or SWIGGY_REDIRECT_URI env vars.",
+                  body: "Missing OAUTH_COOKIE_SECRET or SWIGGY_REDIRECT_URI env vars.",
           };
+    }
+
+    let clientId;
+    try {
+          clientId = await getSwiggyClientId(redirectUri);
+    } catch (e) {
+          console.error("Swiggy client registration failed:", e.message);
+          return { statusCode: 502, body: "Could not register with Swiggy MCP — try again shortly." };
     }
 
     let authorizeEndpoint;
