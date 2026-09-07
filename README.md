@@ -50,11 +50,16 @@ git push -u origin main
    - Publish directory: `dist`
 4. Click **Deploy**
 
-### Step 5 — Add environment variable on Netlify
+### Step 5 — Add environment variables on Netlify
 
 1. Site Settings → Environment Variables
-2. Add: `ANTHROPIC_API_KEY` = your key
+2. Add:
+   - `ANTHROPIC_API_KEY` = your key
+   - `OAUTH_COOKIE_SECRET` = a random long string (e.g. `openssl rand -hex 32`)
+   - `SWIGGY_REDIRECT_URI` = `https://fitorder.netlify.app/api/auth/callback/swiggy` (must exactly match what's whitelisted with Swiggy Builders Club)
 3. Redeploy
+
+No `SWIGGY_CLIENT_ID` needed — Swiggy MCP uses Dynamic Client Registration, so the app registers itself on first use and caches the `client_id` in Netlify Blobs.
 
 **Your site is live.** Share the URL with builders@swiggy.in
 
@@ -91,7 +96,7 @@ fitorder/
 │   ├── hooks/
 │   │   └── useAgent.js       # Agent state + API calls
 │   ├── App.jsx               # View orchestration
-│   └── main.jsx              # Entry point
+│   └── main.jsx               # Entry point
 ├── public/
 │   └── index.html
 ├── netlify.toml              # Netlify config + redirects
